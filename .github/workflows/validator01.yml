@@ -22,6 +22,8 @@ jobs:
         run: |
           echo ${{ env.VALIDATOR_NAME }}
           echo ${{ env.VOLUME_PATH }}
+          echo ${{ env.DATA_PATH }}
+          mkdir -k ${{ env.DATA_PATH }}
 
       - name: Install Validator
         run: |
