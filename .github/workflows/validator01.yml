@@ -13,7 +13,7 @@ jobs:
     env:
       VOLUME_PATH: /mnt/volume_lon1_01
       VALIDATOR_NAME: validator01
-      DATA_PATH: /mnt/volume_lon1_01/${{ env.VALIDATOR_NAME }}_data
+      DATA_PATH: /mnt/volume_lon1_01/validator01_data
 
     steps:
       - uses: actions/checkout@v2
