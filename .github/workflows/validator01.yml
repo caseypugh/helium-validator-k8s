@@ -5,11 +5,15 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
+  
+  workflow_dispatch:
+    inputs:
+      setup:
+        description: 'Setup'
+        default: '1'
 jobs:
   build:
-    runs-on: self-hosted
-
+    runs-on: validator01
     env:
       VOLUME_PATH: /mnt/volume_lon1_01
       VALIDATOR_NAME: validator01
@@ -17,19 +21,5 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Setup
-        run: |
-          echo ${{ env.VALIDATOR_NAME }}
-          echo ${{ env.VOLUME_PATH }}
-          echo ${{ env.DATA_PATH }}
-          mkdir -p ${{ env.DATA_PATH }}
-
-      - name: Install Validator
-        run: |
-          docker run -d \
-            --restart always \
-            --publish 2154:2154/tcp \
-            --name validator \
-            --mount type=bind,source=${{ env.DATA_PATH }},target=/var/data \
-            quay.io/team-helium/validator:latest-val-amd64
+      - name: Update validator instance
+        run: .github/scripts/update.sh
