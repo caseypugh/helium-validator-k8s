@@ -2,3 +2,4 @@
 .kube/config
 sshpass
 keys/*
+keys.yml
