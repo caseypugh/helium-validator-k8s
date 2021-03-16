@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-web-service
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 2154
+    targetPort: 2154
+  selector:
+    name: go-web-app

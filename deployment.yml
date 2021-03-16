@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: validator01
+spec:
+  selector:
+    matchLabels:
+      name: validator01
+  serviceName: "validator01"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: validator01
+    spec:
+      containers:
+        # - name: nginx-container
+        #   image: nginx
+        #   volumeMounts:
+        #     - name: csi-pvc
+        #       mountPath: "/var/data"
+
+        - name: attractive-vermilion-urchin
+          image: quay.io/team-helium/validator:latest-val-amd64
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 2154
+          volumeMounts:
+            - name: csi-pvc
+              mountPath: "/var/data"
+
+  volumeClaimTemplates:
+    - metadata:
+        name: csi-pvc
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 50Gi
+        storageClassName: do-block-storage
