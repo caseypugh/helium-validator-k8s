@@ -2,24 +2,26 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: validator
+  name: helium-validator
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: validator
-  serviceName: "validator"
+      name: helium-validator
+  serviceName: "helium-validator"
   template:
     metadata:
       labels:
-        name: validator
+        name: helium-validator
     spec:
       containers:
-        - name: nginx-container
-          image: nginx
+        - name: monitor
+          image: cpucpu/validator-monitor
           volumeMounts:
-            - name: validator-vol
+            - name: csi-pvc
               mountPath: "/var/data"
+            - name: keys
+              mountPath: "/etc/keys"
 
         - name: validator
           image: quay.io/team-helium/validator:latest-val-amd64
@@ -27,12 +29,18 @@ spec:
           ports:
             - containerPort: 2154
           volumeMounts:
-            - name: validator-vol
+            - name: csi-pvc
               mountPath: "/var/data"
+              
+      volumes:
+        - name: keys
+          secret:
+            secretName: swarm-keys
+            defaultMode: 0400
 
   volumeClaimTemplates:
     - metadata:
-        name: validator-vol
+        name: csi-pvc
       spec:
         accessModes:
           - ReadWriteOnce

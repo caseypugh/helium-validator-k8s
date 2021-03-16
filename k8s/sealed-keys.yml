@@ -1,0 +1,15 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: swarm-keys
+  namespace: default
+spec:
+  encryptedData:
+    helium-validator-0-swarm-key: AgBLrSfJJactG2qioNWDD8DbxzFfPuIR5cbHX5/QTGQo5Q9KXZoFH+/GtxdqZWIGJsI35dm+k13Zg0jEq9hpapR05EtacM4qbM4JF1Zjy1T+qqjwgNe7K0D/mkrDBbfBpeSKS08XgAbdTxqpdSUnzBCsEKYFLjUUPqF9IYVfgFvX3u75w/WHP1suOe/+qAtq8O/oOUN02HJ1yF9IG/03AX6JJUBM8ln14m9WPFLGOPyDdBFlKYfZBt2W1YXSyTKmjWQsGvAv4i0kV0HUIKbjZuHZXhF7winWaArWElCIGjEus+qDlTPguqTZz+Ph5KxjsWOC6BaK97G37BgpYLHTWdWe/id5Gve9qOv4Na20/0SlBuFStJihxX+63BiZiwztISmNwdiFJcICnFQgsEjNLBMJHZIN99RmsOWj8kBhnZKgH9ihwQqEg9EDdJw1nkF3pn8S20X7pAodCSZdkJKyt1+xFuJ+FyNkyCmWBZIRKZpm6BSfHNgRK+L8qo37kO3cxv/MVzDghyJO65q88IRjzVVVbnAF9CaS3DAtMBDi38DntiobQpVsjPLDIbUmiaDm2CnAXNcILDOt2yl8Y90KnMEDqpZtL5QyKuFPii9NPr6DsYZZ/Hr5aS7bRQ+eAPeZpX5wibN/UoHknQ+42GYGcvotQ/HvDJDLI5xU7cJfrS3yTmLZHONBnbi3lvf5A6DQrjlvAyIoZUqSfX0rk484w1HMnYUifw92zW1PBCzze3vGhCuH+iFxD/qbcrae4OFwBR7PruPLkKMB9tHboxRPz34VzDkeSftBpAIrxymPb07U0V+2V61KlAT/x1NQozxVKGaglA==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: swarm-keys
+      namespace: default
+
