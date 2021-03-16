@@ -1,3 +1,4 @@
 .env
 .kube/config
 sshpass
+keys/*

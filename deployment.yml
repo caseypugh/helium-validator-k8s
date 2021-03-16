@@ -2,17 +2,17 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: validator01
+  name: helium-validator
 spec:
   selector:
     matchLabels:
-      name: validator01
-  serviceName: "validator01"
+      name: helium-validator
+  serviceName: "my-helium-validator"
   replicas: 1
   template:
     metadata:
       labels:
-        name: validator01
+        name: helium-validator
     spec:
       containers:
         # - name: nginx-container
@@ -21,7 +21,7 @@ spec:
         #     - name: csi-pvc
         #       mountPath: "/var/data"
 
-        - name: attractive-vermilion-urchin
+        - name: validator
           image: quay.io/team-helium/validator:latest-val-amd64
           imagePullPolicy: Always
           ports:
