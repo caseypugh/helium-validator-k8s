@@ -16,7 +16,13 @@ spec:
     spec:
       containers:
         - name: monitor
-          image: cpucpu/validator-monitor
+          image: cpucpu/validator-monitor:latest
+          imagePullPolicy: Always
+          env:
+            - name: pvc_path
+              value: "/var/data"
+            - name: swarm_keys_path
+              value: "/etc/keys"
           volumeMounts:
             - name: csi-pvc
               mountPath: "/var/data"
