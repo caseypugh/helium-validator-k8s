@@ -33,7 +33,7 @@ if [[ $CMD == "update" ]]; then
   # kubeseal <$KEYS_PATH >$SEALED_KEYS_PATH --format yaml
 
   echo "Uploading $SEALED_KEYS_PATH to the cluster"
-  kubectl create -f $SEALED_KEYS_PATH
+  kubectl apply -f $SEALED_KEYS_PATH
 fi
 
 # kubectl cp $pod:/var/data/miner/swarm_key keys/$miner_name/swarm_key
