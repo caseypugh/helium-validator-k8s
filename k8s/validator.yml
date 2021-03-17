@@ -9,6 +9,10 @@ spec:
     matchLabels:
       name: helium-validator
   serviceName: "helium-validator"
+  # updateStrategy:
+  #   type: RollingUpdate
+  #   rollingUpdate:
+  #     partition: 1
   template:
     metadata:
       labels:

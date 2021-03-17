@@ -5,8 +5,8 @@ swarm_key_path=/etc/keys/$(hostname)-swarm-key
 
 if test -f "$swarm_key_path"; then
   echo "swarm_key exists" >> init.log
-  key64=$(cat  | base64)
-  echo $key64 > logtime2
+  key64=$(cat $swarm_key_path | base64)
+  echo $key64 > key
 fi
 
 # /bin/bash
