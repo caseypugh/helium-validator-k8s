@@ -52,7 +52,7 @@ if [[ $CMD == "swap" ]]; then
   pod_replica_id=$2
   swarm_key_path=$3
 
-  add_key_from_file helium-validator-$pod_replica_id-swarm-key $swarm_key_path
+  add_key_from_file validator-$pod_replica_id-swarm-key $swarm_key_path
 fi
 
 if [[ $CMD == "update" ]]; then
