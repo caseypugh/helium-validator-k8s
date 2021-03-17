@@ -1,7 +1,7 @@
 name: Scheduled Updater
 on:
   schedule:
-    - cron:  '*/5 * * * *'
+    - cron:  '*/15 * * * *'
 
   workflow_dispatch:
     inputs:
@@ -23,4 +23,6 @@ jobs:
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
         
       - name: Output miner version
-        run: kubectl exec -it helium-validator-0 -c validator -- /bin/sh -c "miner versions"
+        run: |
+          cd $HOME
+          kubectl exec -it helium-validator-0 -c validator -- /bin/sh -c "miner versions"
