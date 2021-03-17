@@ -2,7 +2,11 @@
 
 - Install [kubectl](https://kubernetes.io/docs/tasks/tools/)
 - Install kubeseal: `brew install kubeseal`
-- [Download kube config](https://cloud.digitalocean.com/kubernetes/clusters/3d30c10c-e5f3-40e5-a527-1d0d5c9f7edd?i=3ff5d8) from Digital Ocean and put in `.kube/config`
+- Install doctl: `brew install doctl`
+- Download kubeconfig with doctl
+```
+doctl kubernetes cluster kubeconfig save helium-cluster
+```
 
 ### Development
 - Modify `validator.yml`. Use `scripts/deploy.sh` to deploy changes to the Pod.

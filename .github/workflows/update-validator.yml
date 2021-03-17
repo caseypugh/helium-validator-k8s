@@ -1,4 +1,4 @@
-name: Miner Updater
+name: Validator Updater
 on:
   schedule:
     - cron:  '*/15 * * * *'
@@ -15,21 +15,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      # - uses: azure/setup-kubectl@v1
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      - name: Save DigitalOcean kubeconfig with short-lived credentials
+      - name: Fetch .kube/config
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 helium-cluster
       
-      # - name: Setup kube config
-      #   run: |
-      #     mkdir -p $GITHUB_WORKSPACE/.kube
-      #     echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $GITHUB_WORKSPACE/.kube/config
-        
-      - name: Output miner version
-        run: |
-          kubectl exec -it helium-validator-0 -c validator -- /bin/sh -c "miner versions"
+      - name: Update validator
+        run: scripts/validator.sh update
+          
