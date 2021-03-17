@@ -1,12 +1,17 @@
 #!/bin/bash
-echo "hostname=$(hostname)";
 swarm_key_path=/etc/keys/$(hostname)-swarm-key
-# volume_swarm_key_path=/var/data/test
+volume_swarm_key_path=/var/data/miner/swarm_key
 
 if test -f "$swarm_key_path"; then
   echo "swarm_key exists" >> init.log
-  key64=$(cat $swarm_key_path | base64)
-  echo $key64 > key
+  echo "backing up volume swarm key" >> init.log
+  cp $volume_swarm_key_path swarm_key_bak
+
+  echo "moving $swarm_key_path to $volume_swarm_key_path" >> init.log
+  
+  cp $swarm_key_path $volume_swarm_key_path 
+else
+  echo "$swarm_key_path not found" >> init.log
 fi
 
 # /bin/bash
