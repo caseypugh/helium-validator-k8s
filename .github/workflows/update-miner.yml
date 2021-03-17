@@ -18,7 +18,9 @@ jobs:
       - uses: azure/setup-kubectl@v1
       
       - name: Setup kube config
-        run: echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
         
       - name: Output miner version
         run: kubectl exec -it helium-validator-0 -c validator -- /bin/sh -c "miner versions"
