@@ -1,3 +1,5 @@
+#!/bin/bash
+
 CMD=$1
 QUAY_URL='https://quay.io/api/v1/repository/team-helium/validator/tag/?limit=20&page=1&onlyActiveTags=true'
 ARCH=amd
@@ -37,4 +39,28 @@ if [[ $CMD == "update" ]]; then
 
     scripts/deploy.sh
   fi
+fi
+
+if [[ $CMD == "info" ]]; then
+  validator_count=$(kubectl get pods | grep -c "validator")
+  for ((i = 0 ; i < $validator_count ; i++)); do
+    pod="validator-$i"
+
+    echo; echo "Pod: $pod"
+    
+    miner_name=$(kubectl exec -it $pod -c validator -- sh -c "miner info name" | egrep -o "[a-z]+-[a-z]+-[a-z]+" | xargs)
+    address=$(kubectl exec -it $pod -c validator -- sh -c "miner peer addr")
+    address=$(echo $address | sed 's/\/p2p\///')
+    
+    echo "Miner Name: $miner_name"
+    echo "Miner Address: $address"
+    echo "Validator API: https://testnet-api.helium.wtf/v1/validators/$address"
+
+    kubectl exec -it $pod -c validator -- sh -c "miner info p2p_status && miner peer book -s"
+  done
+fi
+
+if [[ $CMD == "bash" ]]; then
+  pod_id=$2
+  kubectl exec -it validator-$pod_id -c validator -- /bin/sh
 fi
