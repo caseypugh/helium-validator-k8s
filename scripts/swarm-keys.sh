@@ -3,6 +3,7 @@
 CMD=$1
 KEYS_TMPL=k8s/keys.template.yml
 KEYS_PATH=k8s/keys.yml # should be gitignored
+SEALED_KEYS_PATH=k8s/sealed-keys.yml
 
 if [[ $CMD == "sync" ]]; then
   echo; echo "Downloading swarm_keys from cluster..."
@@ -36,10 +37,10 @@ fi
 
 if [[ $CMD == "update" ]]; then
   echo "Encrypting $KEYS_PATH"
-  kubeseal <$KEYS_PATH >sealed-keys.yml --format yaml
+  kubeseal <$KEYS_PATH >$SEALED_KEYS_PATH --format yaml
 
-  echo "Uploading sealed-keys.yml to the cluster"
-  kubectl create -f sealed-keys.yml
+  echo "Uploading $SEALED_KEYS_PATH to the cluster"
+  kubectl create -f $SEALED_KEYS_PATH
 fi
 
 # kubectl cp $pod:/var/data/miner/swarm_key keys/$miner_name/swarm_key
