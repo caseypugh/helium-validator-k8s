@@ -1,31 +1,42 @@
 #!/bin/bash
 
 CMD=$1
+KEYS_TMPL=k8s/keys.template.yml
+KEYS_PATH=k8s/keys.yml # should be gitignored
 
 if [[ $CMD == "sync" ]]; then
+  echo; echo "Downloading swarm_keys from cluster..."
+
+  if [ ! -f "$KEYS_PATH" ]; then
+    echo "Generating $KEYS_PATH"
+    cat $KEYS_TMPL > $KEYS_PATH
+  fi
+
   kubectl get pods | egrep -o "helium-validator-[0-9]" | while read -r pod; do 
-    miner_name=$(kubectl exec -it $pod -- sh -c "miner info name" | xargs)
-    address=$(kubectl exec -it $pod -- sh -c "miner peer addr")
+    miner_name=$(kubectl exec -it $pod -c validator -- sh -c "miner info name" | xargs)
+    address=$(kubectl exec -it $pod -c validator -- sh -c "miner peer addr")
     address=$(echo $address | sed 's/\/p2p\///')
     
     mkdir -p keys
     mkdir -p keys/$miner_name
 
-    kubectl cp $pod:/var/data/miner/swarm_key keys/$miner_name/swarm_key
+    kubectl cp $pod:/var/data/miner/swarm_key keys/$miner_name/swarm_key -c validator
 
     echo "Pod: $pod"
     echo "Name: $miner_name"
     echo "Address: $address"
 
-    # echo "  $pod-name: $(echo $miner_name | base64)" >> keys.yml
-    # echo "  $pod-address: $(echo $address | base64)" >> keys.yml
-    echo "  $pod-swarm-key: $(cat keys/$miner_name/swarm_key | base64)" >> keys.yml
+    # echo "  $pod-name: $(echo $miner_name | base64)" >> $KEYS_PATH
+    # echo "  $pod-address: $(echo $address | base64)" >> $KEYS_PATH
+    echo; echo "Adding swarm_key to keys.yml"
+    echo "  $pod-swarm-key: $(cat keys/$miner_name/swarm_key | base64)" >> $KEYS_PATH
+    echo "Make sure you backup the keys/$miner_name/swarm_key in 1password or place of choice."
   done
 fi
 
 if [[ $CMD == "update" ]]; then
-  echo "Encrypting keys.yml"
-  kubeseal <keys.yml >sealed-keys.yml --format yaml
+  echo "Encrypting $KEYS_PATH"
+  kubeseal <$KEYS_PATH >sealed-keys.yml --format yaml
 
   echo "Uploading sealed-keys.yml to the cluster"
   kubectl create -f sealed-keys.yml
