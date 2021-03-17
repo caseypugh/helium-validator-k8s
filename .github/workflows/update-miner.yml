@@ -15,12 +15,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: azure/setup-kubectl@v1
+      # - uses: azure/setup-kubectl@v1
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Save DigitalOcean kubeconfig with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 helium-cluster
       
-      - name: Setup kube config
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $GITHUB_WORKSPACE/.kube/config
+      # - name: Setup kube config
+      #   run: |
+      #     mkdir -p $GITHUB_WORKSPACE/.kube
+      #     echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $GITHUB_WORKSPACE/.kube/config
         
       - name: Output miner version
         run: |
