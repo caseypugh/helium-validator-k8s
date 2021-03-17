@@ -1,5 +1,5 @@
+name: Scheduled Updater
 on:
-  name: update-miner
   schedule:
     - cron:  '*/5 * * * *'
 
