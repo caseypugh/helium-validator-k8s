@@ -21,9 +21,9 @@ add_key_from_file()
 if [[ $CMD == "sync" ]]; then
   echo; echo "Downloading swarm_keys from cluster..."
 
-  validator_count=$(kubectl get pods | grep -c "helium-validator")
+  validator_count=$(kubectl get pods | grep -c "validator")
   for ((i = 0 ; i < $validator_count ; i++)); do
-    pod="helium-validator-$i"
+    pod="validator-$i"
     echo; echo "Pod: $pod"
 
     miner_name=$(kubectl exec -it $pod -c validator -- sh -c "miner info name" | egrep -o "[a-z]+-[a-z]+-[a-z]+" | xargs)
@@ -49,11 +49,10 @@ if [[ $CMD == "sync" ]]; then
 fi
 
 if [[ $CMD == "swap" ]]; then
-  pod_name=$2
+  pod_replica_id=$2
   swarm_key_path=$3
 
-  add_key_from_file $pod_name-swarm-key $swarm_key_path
-  # scripts/swarm-keys.sh update
+  add_key_from_file helium-validator-$pod_replica_id-swarm-key $swarm_key_path
 fi
 
 if [[ $CMD == "update" ]]; then

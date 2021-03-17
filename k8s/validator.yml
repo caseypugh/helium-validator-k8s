@@ -2,13 +2,13 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: helium-validator
+  name: validator
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      name: helium-validator
-  serviceName: "helium-validator"
+      name: validator
+  serviceName: "validator"
   # updateStrategy:
   #   type: RollingUpdate
   #   rollingUpdate:
@@ -16,19 +16,19 @@ spec:
   template:
     metadata:
       labels:
-        name: helium-validator
+        name: validator
     spec:
       containers:
         - name: monitor
           image: cpucpu/validator-monitor:latest
           imagePullPolicy: Always
-          env:
-            - name: pvc_path
-              value: "/var/data"
-            - name: swarm_keys_path
-              value: "/etc/keys"
+          # env:
+          #   - name: pvc_path
+          #     value: "/var/data"
+          #   - name: swarm_keys_path
+          #     value: "/etc/keys"
           volumeMounts:
-            - name: csi-pvc
+            - name: validator-vol
               mountPath: "/var/data"
             - name: keys
               mountPath: "/etc/keys"
@@ -39,7 +39,7 @@ spec:
           ports:
             - containerPort: 2154
           volumeMounts:
-            - name: csi-pvc
+            - name: validator-vol
               mountPath: "/var/data"
               
       volumes:
@@ -50,7 +50,7 @@ spec:
 
   volumeClaimTemplates:
     - metadata:
-        name: csi-pvc
+        name: validator-vol
       spec:
         accessModes:
           - ReadWriteOnce

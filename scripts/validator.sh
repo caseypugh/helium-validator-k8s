@@ -1,7 +1,7 @@
 CMD=$1
 QUAY_URL='https://quay.io/api/v1/repository/team-helium/validator/tag/?limit=20&page=1&onlyActiveTags=true'
 ARCH=amd
-POD_NAME=helium-validator
+POD_NAME=validator
 
 if [[ $CMD == "update" ]]; then
   

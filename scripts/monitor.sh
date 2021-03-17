@@ -1,7 +1,7 @@
 #!/bin/bash
 
 container_name=monitor
-pod_name=helium-validator
+pod_name=validator
 pod_replica=$2
 CMD=$1
 

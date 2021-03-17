@@ -8,8 +8,8 @@ else
   kubectl apply -f k8s/validator.yml
 
   # Delete all the validator pods. StatefulSet will automatically recreate them
-  validator_count=$(kubectl get pods | grep -c "helium-validator")
+  validator_count=$(kubectl get pods | grep -c "validator")
   for ((i = 0 ; i < $validator_count ; i++)); do
-    kubectl delete pod helium-validator-$i &
+    kubectl delete pod validator-$i &
   done  
 fi

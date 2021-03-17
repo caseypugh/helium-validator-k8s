@@ -3,9 +3,9 @@
 CMD=$1
 
 if [[ $CMD == "info" ]]; then
-  validator_count=$(kubectl get pods | grep -c "helium-validator")
+  validator_count=$(kubectl get pods | grep -c "validator")
   for ((i = 0 ; i < $validator_count ; i++)); do
-    pod="helium-validator-$i"
+    pod="validator-$i"
 
     echo; echo "Pod: $pod"
     
