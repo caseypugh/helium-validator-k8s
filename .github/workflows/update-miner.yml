@@ -3,16 +3,16 @@ on:
   schedule:
     - cron:  '*/5 * * * *'
 
-  jobs:
-    update:
-      runs-on: ubuntu-latest
+jobs:
+  update:
+    runs-on: ubuntu-latest
 
-      steps:
-        - uses: actions/checkout@v2
-        - uses: azure/setup-kubectl@v1
+    steps:
+      - uses: actions/checkout@v2
+      - uses: azure/setup-kubectl@v1
+      
+      - name: Setup kube config
+        run: echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
         
-        - name: Setup kube config
-          run: echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-          
-        - name: Output miner version
-          run: kubectl exec -it helium-validator-0 -c validator -- /bin/sh -c "miner versions"
+      - name: Output miner version
+        run: kubectl exec -it helium-validator-0 -c validator -- /bin/sh -c "miner versions"
