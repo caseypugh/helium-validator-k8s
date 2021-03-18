@@ -16,7 +16,7 @@ if [[ $CMD == "update" ]]; then
   docker image push cpucpu/validator-monitor:latest
 
   # Tell Pods to update the image
-  scripts/deploy.sh
+  scripts/deploy
 fi
 
 if [[ $CMD == "logs" ]]; then

@@ -4,6 +4,14 @@ CMD=$1
 QUAY_URL='https://quay.io/api/v1/repository/team-helium/validator/tag/?limit=20&page=1&onlyActiveTags=true'
 ARCH=amd
 POD_NAME=validator
+CONTAINER_NAME=validator
+
+container_validator_version()
+{
+  replica=$1
+  kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -- /bin/sh -c "miner versions" | egrep -o "[0-9]+.[0-9]+.[0-9]+" | xargs
+}
+
 
 if [[ $CMD == "update" ]]; then
   
@@ -18,26 +26,26 @@ if [[ $CMD == "update" ]]; then
 
   miner_latest_name=$(echo "$miner_quay" | grep -v HTTP_Response | jq -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH)and contains("_val")) ][0].name' | cut -d'"' -f2)
   miner_latest_version=$(echo $miner_latest_name | egrep -o "[0-9]+.[0-9]+.[0-9]+" | xargs)
-  container_miner_version=$(kubectl exec -it $POD_NAME-0 -c validator -- /bin/sh -c "miner versions" | egrep -o "[0-9]+.[0-9]+.[0-9]+" | xargs)
+  container_version=$(container_validator_version 0)
 
   # echo $MINER_VERSION
   # echo $miner_quay
   # echo $miner_response
   # echo $miner_latest
 
-  if [ -z "$container_miner_version" ]; then
+  if [ -z "$container_version" ]; then
     echo "Validator is not up right now. Try again later"
     exit 0
   fi
 
-  if [[ $miner_latest_version == $container_miner_version ]]; then
-    echo "Already at latest version: $container_miner_version"
+  if [[ $miner_latest_version == $container_version ]]; then
+    echo "Already at latest version: $container_version"
   else
     echo "Out of date!"
     echo "Latest version: $miner_latest_version"
-    echo "Container version: $container_miner_version"
+    echo "Container version: $container_version"
 
-    scripts/deploy.sh
+    scripts/deploy
   fi
 fi
 
@@ -52,9 +60,11 @@ if [[ $CMD == "info" ]]; then
     address=$(kubectl exec -it $pod -c validator -- sh -c "miner peer addr")
     address=$(echo $address | sed 's/\/p2p\///')
     
-    echo "Miner Name: $miner_name"
-    echo "Miner Address: $address"
+    echo "Name: $miner_name"
+    echo "Address: $address"
+    echo "Version: $(container_validator_version 0)"
     echo "Validator API: https://testnet-api.helium.wtf/v1/validators/$address"
+    echo "Quay: $QUAY_URL"
 
     kubectl exec -it $pod -c validator -- sh -c "miner info p2p_status && miner peer book -s"
   done

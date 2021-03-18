@@ -60,5 +60,5 @@ if [[ $CMD == "update" ]]; then
   kubectl delete -f $SEALED_KEYS_PATH
   kubectl create -f $SEALED_KEYS_PATH
 
-  scripts/deploy.sh
+  scripts/deploy
 fi

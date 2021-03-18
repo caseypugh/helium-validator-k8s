@@ -30,7 +30,7 @@ And then you'll need to make sure your public cert is the same as the server's:
 kubeseal --fetch-cert >cert.pem
 ```
 
-Afterward you'll need to update `sealed-keys.yml` (TODO) and then publish the updates with `./scripts/swarm-keys.sh update` 
+Afterward you'll need to update `sealed-keys.yml` (TODO) and then publish the updates with `./scripts/swarm-keys update` 
 
 ### Automatic updates
 In order for [automatic miner updates](https://github.com/caseypugh/helium-validator/blob/main/.github/workflows/update-validator.yml) to work, you need to give set the `DIGITALOCEAN_ACCESS_TOKEN` in [Github Secrets](https://github.com/caseypugh/helium-validator/settings/secrets/actions) so the action can run.
@@ -38,6 +38,6 @@ In order for [automatic miner updates](https://github.com/caseypugh/helium-valid
 You can manually trigger an update by visiting the [Validator Updater](https://github.com/caseypugh/helium-validator/actions/workflows/update-validator.yml) and then click `Run workflow`.
 
 # Development
-- Modify `validator.yml`. Use `scripts/deploy.sh` to deploy changes to the Pod.
-- When adding another validator, increase `spec.replicas` by one and deploy. Afterward, run `scripts/swarm-keys.sh sync` to update the swarm keys. 
+- Modify `validator.yml`. Use `scripts/deploy` to deploy changes to the Pod.
+- When adding another validator, increase `spec.replicas` by one and deploy. Afterward, run `scripts/swarm-keys sync` to update the swarm keys. 
 - TODO.... but check out `scripts` folder to see tooling.

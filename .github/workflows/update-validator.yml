@@ -25,5 +25,5 @@ jobs:
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 helium-cluster
       
       - name: Update validator
-        run: scripts/validator.sh update
+        run: scripts/validator update
           
