@@ -14,10 +14,8 @@ container_validator_version()
 
 
 if [[ $CMD == "update" ]]; then
-  
   miner_quay=$(curl -s "$QUAY_URL" --write-out '\nHTTP_Response:%{http_code}')
   miner_response=$(echo "$miner_quay" | grep "HTTP_Response" | cut -d":" -f2)
-  
 
   if [[ $miner_response -ne 200 ]]; then
     echo "Bad Response from Server"
@@ -47,19 +45,18 @@ if [[ $CMD == "update" ]]; then
 
     scripts/deploy restart
   fi
-fi
 
-if [[ $CMD == "info" ]]; then
+elif [[ $CMD == "info" ]]; then
   validator_count=$(kubectl get pods | grep -c "validator")
   for ((i = 0 ; i < $validator_count ; i++)); do
     pod="validator-$i"
 
     echo; echo "Pod: $pod"
-    
+
     miner_name=$(kubectl exec -it $pod -c validator -- sh -c "miner info name" | egrep -o "[a-z]+-[a-z]+-[a-z]+" | xargs)
     address=$(kubectl exec -it $pod -c validator -- sh -c "miner peer addr")
     address=$(echo $address | sed 's/\/p2p\///')
-    
+
     echo "Name: $miner_name"
     echo "Address: $address"
     echo "Version: $(container_validator_version 0)"
@@ -68,9 +65,12 @@ if [[ $CMD == "info" ]]; then
 
     kubectl exec -it $pod -c validator -- sh -c "miner info p2p_status && miner peer book -s"
   done
-fi
 
-if [[ $CMD == "bash" ]]; then
+elif [[ $CMD == "bash" ]]; then
   pod_id=$2
   kubectl exec -it validator-$pod_id -c validator -- /bin/sh
+
+else
+  echo "$0: unknown command \"$CMD\""
+  exit 1
 fi
