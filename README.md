@@ -43,7 +43,25 @@ In order for [automatic miner updates](https://github.com/caseypugh/helium-valid
 
 You can manually trigger an update by visiting the [Validator Updater](https://github.com/caseypugh/helium-validator/actions/workflows/update-validator.yml) and then click `Run workflow`.
 
-# Development
-- Modify `validator.yml`. Use `scripts/deploy` to deploy changes to the Pod.
-- When adding another validator, increase `spec.replicas` by one and deploy. Afterward, run `scripts/swarm-keys sync` to update the swarm keys. 
-- TODO.... but check out `scripts` folder to see tooling.
+# Adding a new validator
+- Edit `k8s/validator.yml` and increment `spec.replicas`
+- Run `scripts/deploy` to launch the new validator
+- Run `kubectl get pods -w` to monitor the new pod and verify it launched.
+
+## Managing swarm keys
+Once the validator is running, make sure to download the swarm key: `scripts/swarm-keys sync`. 
+ 
+This will place the key into `keys/$miner_name/swarm_key` and will also encrypt that key into `sealed-keys.yml`. Make sure the yml file gets committed.
+
+Also store the swarm_key in 1password if you want via `cat swarm_key | base64`
+
+### Swapping out a swarm key
+If you want to update a swarm key, then run:
+```sh
+scripts/swarm-keys swap $replica_id $path_to_swarm_key
+
+# sample
+# scripts/swarm-keys swap 1 ~/swarm_key
+```
+
+This will automatically update the keys, update `sealed-keys.yml`, and restart the specified pod. 

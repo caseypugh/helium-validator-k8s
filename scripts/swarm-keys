@@ -49,16 +49,20 @@ if [[ $CMD == "sync" ]]; then
 fi
 
 if [[ $CMD == "swap" ]]; then
-  pod_replica_id=$2
-  swarm_key_path=$3
+  replica_id=$2
+  swarm_key_file_path=$3
 
-  add_key_from_file validator-$pod_replica_id-swarm-key $swarm_key_path
+  add_key_from_file validator-$replica_id-swarm-key $swarm_key_file_path
+  echo; echo "validator-$replica_id key was changed."
+
+  scripts/swarm-keys update
+
+  echo "Restarting pod..."
+  scripts/deploy restart $replica_id
 fi
 
 if [[ $CMD == "update" ]]; then
   echo "Uploading $SEALED_KEYS_PATH to the cluster"
   kubectl delete -f $SEALED_KEYS_PATH
   kubectl create -f $SEALED_KEYS_PATH
-
-  scripts/deploy
 fi

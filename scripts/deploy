@@ -1,17 +1,21 @@
 #!/bin/bash
 
 CMD=$1
+POD_NAME=validator
 
 if [[ $CMD == "restart" ]]; then
-  # TODO probably can just remove this?
-  kubectl delete -f k8s/validator.yml && \
-  kubectl apply -f k8s/validator.yml
-else
-  kubectl apply -f k8s/validator.yml
+  replica_id=$2
 
-  # Delete all the validator pods. StatefulSet will automatically recreate them
-  validator_count=$(kubectl get pods | grep -c "validator")
-  for ((i = 0 ; i < $validator_count ; i++)); do
-    kubectl delete pod validator-$i &
-  done  
+  if [ -z "$replica_id" ]; then
+    # Delete all the validator pods. StatefulSet will automatically recreate them
+    validator_count=$(kubectl get pods | grep -c "$POD_NAME")
+    for ((i = 0 ; i < $validator_count ; i++)); do
+      kubectl delete pod $POD_NAME-$i &
+    done
+  else
+    # Just restart the pod specified
+    kubectl delete pod $POD_NAME-$replica_id &
+  fi  
 fi
+
+kubectl apply -f k8s/validator.yml
