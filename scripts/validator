@@ -70,6 +70,10 @@ elif [[ $CMD == "bash" ]]; then
   pod_id=$2
   kubectl exec -it validator-$pod_id -c validator -- /bin/sh
 
+elif [[ $CMD == "logs" ]]; then
+  pod_id=$2
+  kubectl exec validator-$pod_id -c validator -- tail -F /var/data/log/{console,error,crash}.log
+
 else
   echo "$0: unknown command \"$CMD\""
   exit 1
