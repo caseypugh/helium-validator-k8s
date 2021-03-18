@@ -1,7 +1,7 @@
 name: Validator Updater
 on:
   schedule:
-    - cron:  '*/15 * * * *'
+    - cron:  '*/5 * * * *'
 
   workflow_dispatch:
     inputs:
