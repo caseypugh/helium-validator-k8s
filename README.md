@@ -1,8 +1,8 @@
 # Environment Setup
 
-- Install [kubectl](https://kubernetes.io/docs/tasks/tools/)
-- Install kubeseal: `brew install kubeseal`
-- Install doctl: `brew install doctl`
+- Install `brew install kubectl` (or [Linux/Windows](https://kubernetes.io/docs/tasks/tools/))
+- Install kubeseal: `brew install kubeseal` (or [Linux](https://github.com/bitnami-labs/sealed-secrets/releases/tag/v0.15.0))
+- Install doctl: `brew install doctl` (or [Linux/Windows](https://www.digitalocean.com/docs/apis-clis/doctl/how-to/install/))
 - Create a [new API token](https://cloud.digitalocean.com/account/api/tokens/new) for yourself on Digital Ocean
 - Init doctl & kubernetes cluser access on your computer
 ```sh
@@ -14,6 +14,12 @@ doctl auth switch --context loris
 
 # Download kubeconfig with doctl
 doctl kubernetes cluster kubeconfig save helium-cluster
+```
+
+You're all set! Try running `kubectl get pods` to see if everything is working. You should see something like:
+```sh
+NAME          READY   STATUS    RESTARTS   AGE
+validator-0   2/2     Running   0          16h
 ```
 
 # Cluster Setup
