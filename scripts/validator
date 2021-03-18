@@ -45,7 +45,7 @@ if [[ $CMD == "update" ]]; then
     echo "Latest version: $miner_latest_version"
     echo "Container version: $container_version"
 
-    scripts/deploy
+    scripts/deploy restart
   fi
 fi
 
