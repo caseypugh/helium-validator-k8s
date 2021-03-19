@@ -43,6 +43,15 @@ In order for [automatic miner updates](https://github.com/caseypugh/helium-valid
 
 You can manually trigger an update by visiting the [Validator Updater](https://github.com/caseypugh/helium-validator/actions/workflows/update-validator.yml) and then click `Run workflow`.
 
+(TODO, move this to a k8s job)
+
+### Dynamic Ports
+[Install dynamic host ports](https://github.com/0blu/dynamic-hostports-k8s) so that each miner can have a unique port assigned to each pod
+
+```sh
+kubectl apply -f https://raw.githubusercontent.com/0blu/dynamic-hostports-k8s/master/deploy.yaml
+```
+
 # Adding a new validator
 - Edit `k8s/validator.yml` and increment `spec.replicas`
 - Run `scripts/deploy` to launch the new validator

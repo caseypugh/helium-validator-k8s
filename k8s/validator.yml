@@ -9,44 +9,59 @@ spec:
     matchLabels:
       name: validator
   serviceName: "validator"
-  # updateStrategy:
-  #   type: RollingUpdate
-  #   rollingUpdate:
-  #     partition: 1
   template:
     metadata:
       labels:
         name: validator
+        dynamic-hostports: '2154' # Must be a string. Split multiple ports with '.'
     spec:
       containers:
         - name: monitor
           image: cpucpu/validator-monitor:latest
           imagePullPolicy: Always
-          # env:
-          #   - name: pvc_path
-          #     value: "/var/data"
-          #   - name: swarm_keys_path
-          #     value: "/etc/keys"
           volumeMounts:
             - name: validator-vol
               mountPath: "/var/data"
             - name: keys
               mountPath: "/etc/keys"
-
+              
         - name: validator
           image: quay.io/team-helium/validator:latest-val-amd64
           imagePullPolicy: Always
+          command: [ "sh", "-c" ]
+          args:
+            - export NAT_EXTERNAL_IP=$(wget -qO- ifconfig.me);
+              export NAT_EXTERNAL_PORT=$(cat /etc/podinfo/annotations | grep "k8s/2154" | grep -oE "\"[0-9]+\"" | grep -oE "[0-9]+" | xargs);
+              echo "export NAT_EXTERNAL_IP=$NAT_EXTERNAL_IP" >> /etc/profile;
+              /opt/miner/bin/miner foreground;
+
+          env: 
+            - name: NAT_INTERNAL_PORT
+              value: "2154"
+            - name: NAT_INTERNAL_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+
           ports:
             - containerPort: 2154
           volumeMounts:
             - name: validator-vol
               mountPath: "/var/data"
-              
+            - name: podinfo
+              mountPath: /etc/podinfo
+
       volumes:
         - name: keys
           secret:
             secretName: swarm-keys
             defaultMode: 0400
+        - name: podinfo
+          downwardAPI:
+            items:
+              - path: "annotations"
+                fieldRef:
+                  fieldPath: metadata.annotations
 
   volumeClaimTemplates:
     - metadata:
