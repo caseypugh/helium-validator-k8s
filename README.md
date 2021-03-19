@@ -66,7 +66,6 @@ scripts/swarm-keys swap $replica_id $path_to_swarm_key
 
 This will automatically update the keys, update `sealed-keys.yml`, and restart the specified pod. 
 
-
 # Monitoring
 See [Kubernetes Monitoring Stack](https://marketplace.digitalocean.com/apps/kubernetes-monitoring-stack) details on how to access Grafana. But tl;dr:
 ```sh
