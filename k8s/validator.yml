@@ -16,15 +16,6 @@ spec:
         dynamic-hostports: '2154' # Must be a string. Split multiple ports with '.'
     spec:
       containers:
-        - name: monitor
-          image: cpucpu/validator-monitor:latest
-          imagePullPolicy: Always
-          volumeMounts:
-            - name: validator-vol
-              mountPath: "/var/data"
-            - name: keys
-              mountPath: "/etc/keys"
-              
         - name: validator
           image: quay.io/team-helium/validator:latest-val-amd64
           imagePullPolicy: Always

@@ -18,6 +18,15 @@ add_key_from_file()
   fi
 }
 
+add_key()
+{
+  key=$1
+  value=$2
+
+  kubectl create secret generic $KEY_NAME --dry-run=client --from-literal=$key=$value -o yaml \
+    | kubeseal --merge-into $SEALED_KEYS_PATH --format yaml --cert cert.pem
+}
+
 if [[ $CMD == "sync" ]]; then
   echo; echo "Downloading swarm_keys from cluster..."
 
@@ -41,27 +50,27 @@ if [[ $CMD == "sync" ]]; then
     echo; echo "Adding $miner_name swarm_key to $SEALED_KEYS_PATH"
 
     add_key_from_file $pod-swarm-key keys/$miner_name/swarm_key
-    # add_key $pod-miner-name $miner_name
-    # add_key $pod-miner-address $address
+    add_key $pod-miner-name $miner_name
+    add_key $pod-miner-address $address
     
     echo "Make sure you backup keys/$miner_name/swarm_key in 1password or place of choice."
   done
-fi
 
-if [[ $CMD == "swap" ]]; then
+elif [[ $CMD == "swap" ]]; then
   replica_id=$2
   swarm_key_file_path=$3
+  pod=validator-$replica_id
 
-  add_key_from_file validator-$replica_id-swarm-key $swarm_key_file_path
-  echo; echo "validator-$replica_id key was changed."
+  add_key_from_file $pod-swarm-key $swarm_key_file_path
+  echo; echo "Copying $swarm_key_file_path to $pod."
+  kubectl cp $swarm_key_file_path $pod:/var/data/miner/swarm_key -c validator
 
   scripts/swarm-keys update
 
-  echo "Restarting pod..."
+  echo "Restarting $pod..."
   scripts/deploy restart $replica_id
-fi
 
-if [[ $CMD == "update" ]]; then
+elif [[ $CMD == "update" ]]; then
   echo "Uploading $SEALED_KEYS_PATH to the cluster"
   kubectl delete -f $SEALED_KEYS_PATH
   kubectl create -f $SEALED_KEYS_PATH
