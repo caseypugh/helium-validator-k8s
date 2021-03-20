@@ -28,11 +28,20 @@ spec:
         - name: validator
           image: quay.io/team-helium/validator:latest-val-amd64
           imagePullPolicy: Always
-          command: [ "sh", "-c" ]
+          command: [ "/bin/ash", "-c" ]
           args:
-            - export NAT_EXTERNAL_IP=$(wget -qO- ifconfig.me);
-              export NAT_EXTERNAL_PORT=$(cat /etc/podinfo/annotations | grep "k8s/2154" | grep -oE "\"[0-9]+\"" | grep -oE "[0-9]+" | xargs);
-              echo "export NAT_EXTERNAL_IP=$NAT_EXTERNAL_IP" >> /etc/profile;
+            - while [ -z $NAT_EXTERNAL_PORT ]; do
+                port=$(cat /etc/podinfo/annotations | grep "k8s/2154" | grep -oE "\"[0-9]+\"" | grep -oE "[0-9]+" | xargs);
+                
+                if [ -n "$port" ]; then
+                  export NAT_EXTERNAL_IP=$(wget -qO- ifconfig.me);
+                  export NAT_EXTERNAL_PORT=$port;
+                  
+                  echo "export NAT_EXTERNAL_IP=$NAT_EXTERNAL_IP" >> /etc/profile;
+                  echo "export NAT_EXTERNAL_PORT=$NAT_EXTERNAL_PORT" >> /etc/profile;
+                fi;
+                sleep 3;
+              done;
               /opt/miner/bin/miner foreground;
 
           env: 
