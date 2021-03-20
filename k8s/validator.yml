@@ -4,7 +4,7 @@ kind: StatefulSet
 metadata:
   name: validator
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
       name: validator
@@ -28,10 +28,11 @@ spec:
                   export NAT_EXTERNAL_IP=$(wget -qO- ifconfig.me);
                   export NAT_EXTERNAL_PORT=$port;
                   
-                  echo "export NAT_EXTERNAL_IP=$NAT_EXTERNAL_IP" >> /etc/profile;
-                  echo "export NAT_EXTERNAL_PORT=$NAT_EXTERNAL_PORT" >> /etc/profile;
+                  echo "export NAT_EXTERNAL_IP=$NAT_EXTERNAL_IP" >> ~/.profile;
+                  echo "export NAT_EXTERNAL_PORT=$NAT_EXTERNAL_PORT" >> ~/.profile;
+                  break;
                 fi;
-                sleep 3;
+                sleep 2;
               done;
               /opt/miner/bin/miner foreground;
 
@@ -42,17 +43,27 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
 
           ports:
             - containerPort: 2154
           volumeMounts:
             - name: validator-vol
-              mountPath: "/var/data"
+              mountPath: /var/data
             - name: podinfo
               mountPath: /etc/podinfo
+            - name: miner
+              mountPath: /etc/miner
 
       volumes:
-        - name: keys
+        - name: miner
           secret:
             secretName: swarm-keys
             defaultMode: 0400
