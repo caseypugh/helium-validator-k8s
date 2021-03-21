@@ -69,6 +69,7 @@ elif [[ $CMD == "info" ]]; then
     echo "Name: $(get_miner_name $i)"
     echo "Address: $address"
     echo "Version: $(container_validator_version 0)"
+    echo "In consensus: $(kubectl exec -it $pod -c validator -- sh -c "miner info in_consensus")"
     echo "Validator API: https://testnet-api.helium.wtf/v1/validators/$address"
     # echo "Quay: $QUAY_URL"
 
