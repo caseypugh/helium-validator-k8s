@@ -108,6 +108,7 @@ elif [[ $CMD == "stake" ]]; then
 
   helium-wallet -f $wallet_path validators stake $address $amount --commit
 
+  echo; echo "Staked! Visit https://testnet-api.helium.wtf/v1/validators/$address to see the status"
 else
   echo "$0: unknown command \"$CMD\""
   exit 1
