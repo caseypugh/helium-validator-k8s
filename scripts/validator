@@ -12,6 +12,18 @@ container_validator_version()
   kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -- /bin/sh -c "miner versions" | egrep -o "[0-9]+.[0-9]+.[0-9]+" | xargs
 }
 
+get_miner_name()
+{
+  pod_id=$1
+  kubectl exec -it validator-$pod_id -c validator -- sh -c "miner info name" | egrep -o "[a-z]+-[a-z]+-[a-z]+" | xargs
+}
+
+get_miner_address()
+{
+  pod_id=$1
+  
+  kubectl exec -it validator-$pod_id -c validator -- sh -c "miner peer addr" | grep -oE "[0-9a-zA-Z]{6,}"
+}
 
 if [[ $CMD == "update" ]]; then
   miner_quay=$(curl -s "$QUAY_URL" --write-out '\nHTTP_Response:%{http_code}')
@@ -53,15 +65,12 @@ elif [[ $CMD == "info" ]]; then
 
     echo; echo "Pod: $pod"
 
-    miner_name=$(kubectl exec -it $pod -c validator -- sh -c "miner info name" | egrep -o "[a-z]+-[a-z]+-[a-z]+" | xargs)
-    address=$(kubectl exec -it $pod -c validator -- sh -c "miner peer addr")
-    address=$(echo $address | sed 's/\/p2p\///')
-
-    echo "Name: $miner_name"
+    address=$(get_miner_address $i)
+    echo "Name: $(get_miner_name $i)"
     echo "Address: $address"
     echo "Version: $(container_validator_version 0)"
     echo "Validator API: https://testnet-api.helium.wtf/v1/validators/$address"
-    echo "Quay: $QUAY_URL"
+    # echo "Quay: $QUAY_URL"
 
     kubectl exec -it $pod -c validator -- sh -c "miner info p2p_status && miner peer book -s"
   done
@@ -73,6 +82,31 @@ elif [[ $CMD == "bash" ]]; then
 elif [[ $CMD == "logs" ]]; then
   pod_id=$2
   kubectl exec validator-$pod_id -c validator -- tail -F /var/data/log/{console,error,crash}.log
+
+elif [[ $CMD == "stake" ]]; then
+  pod_id=$2
+  wallet_path=$3
+  amount=$4
+  pod="validator-$i"
+
+  if [ -z $pod_id ]; then
+    echo "$0: missing pod_id (aka pod replica number)"
+    exit 1
+  elif [ -z $wallet_path ]; then 
+    echo "$0: missing path to wallet"
+    exit 1
+  elif [ -z $amount ]; then 
+    echo "$0: specify amount of TNT to stake"
+    exit 1
+  fi
+
+  address=$(get_miner_address $pod_id)
+  echo; echo "Name: $(get_miner_name $pod_id)"
+  echo "Address: $address"
+  echo "Wallet path: $wallet_path"
+  echo "Stake amount: $amount"
+
+  helium-wallet -f $wallet_path validators stake $address $amount --commit
 
 else
   echo "$0: unknown command \"$CMD\""
