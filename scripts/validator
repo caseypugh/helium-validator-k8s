@@ -127,6 +127,6 @@ elif [[ $CMD == "kickstart" ]]; then
   kubectl exec -it validator-$pod_id -c validator -- sh -c "miner peer connect /ip4/3.137.173.26/tcp/2154"
 
 else
-  echo "$0: unknown command \"$CMD\" - (update|info|bash|logs|stake|reset_db|stake)"
+  echo "$0: unknown command \"$CMD\" - (update|info|bash|logs|stake|reset_db|kickstart)"
   exit 1
 fi
