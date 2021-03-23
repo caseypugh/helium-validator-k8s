@@ -110,7 +110,23 @@ elif [[ $CMD == "stake" ]]; then
   helium-wallet -f $wallet_path validators stake $address $amount --commit
 
   echo; echo "Staked! Visit https://testnet-api.helium.wtf/v1/validators/$address to see the status"
+
+elif [[ $CMD == "reset_db" ]]; then
+  pod_id=$2
+
+  if [ -z $pod_id ]; then
+    echo "$0: missing pod_id (aka pod replica number)"
+    exit 1
+  fi
+
+  kubectl exec -it validator-$pod_id -c validator -- sh -c "cd /var/data; rm -rf *.db; rm -rf blockchain_swarm; rm -rf log; rm -rf lost+found;"
+  kubectl delete pod validator-$pod_id &
+
+elif [[ $CMD == "kickstart" ]]; then
+  pod_id=$2
+  kubectl exec -it validator-$pod_id -c validator -- sh -c "miner peer connect /ip4/3.137.173.26/tcp/2154"
+
 else
-  echo "$0: unknown command \"$CMD\""
+  echo "$0: unknown command \"$CMD\" - (update|info|bash|logs|stake|reset_db|stake)"
   exit 1
 fi
