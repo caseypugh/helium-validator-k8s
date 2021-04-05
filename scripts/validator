@@ -92,6 +92,11 @@ elif [[ $CMD == "peers" ]]; then
     kubectl exec -it $pod -c validator -- sh -c "miner peer book -s"
   done
 
+elif [[ $CMD == "cg_perf" ]]; then
+  # pass additional arguments through, like "--format=csv"
+  shift
+  kubectl exec -it validator-0 -c validator -- sh -c "miner hbbft perf $@"
+
 elif [[ $CMD == "bash" ]]; then
   pod_id=$2
   kubectl exec -it validator-$pod_id -c validator -- /bin/sh
