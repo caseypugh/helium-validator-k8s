@@ -1,3 +1,8 @@
 #!/bin/bash
 
-kubectl port-forward svc/kube-prometheus-stack-grafana 8080:80 -n kube-prometheus-stack
+kubectl port-forward svc/kube-prometheus-stack-grafana 8080:80 -n kube-prometheus-stack &
+echo "Visit =>"
+echo "http://localhost:8080"
+echo
+wait
+echo "All done"
