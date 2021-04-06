@@ -1,8 +1,14 @@
 #!/bin/bash
 
+
 kubectl port-forward svc/kube-prometheus-stack-grafana 8080:80 -n kube-prometheus-stack &
+kubectl port-forward svc/kube-prometheus-stack-prometheus 9090 -n kube-prometheus-stack &
+kubectl port-forward svc/kube-prometheus-stack-alertmanager 9093 -n kube-prometheus-stack &
+
 echo "Visit =>"
-echo "http://localhost:8080"
+echo "Grafana: http://localhost:8080 -- user/pass=admin/prom-operator"
+echo "Prometheus query tool: http://localhost:9090"
+echo "Alertmanager: http://localhost:9093"
 echo
 wait
 echo "All done"
