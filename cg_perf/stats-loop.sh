@@ -11,7 +11,5 @@ while [ 1 ]; do
 
   ../scripts/validator cg_perf --format=csv > $outfile
 
-  ./notify-discord.sh "$outfile"
-
   sleep 60
 done
