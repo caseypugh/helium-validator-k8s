@@ -1,13 +1,14 @@
 #!/bin/bash
 
 outfile="$1"
+webhook_url="$WEBHOOK_URL"
 
 if [ -z $outfile ]; then
 	echo "$0: specify a cg cache file as first argument (TODO or stdin)"
 	exit 1
 fi
 
-if [ -z $WEBHOOK_URL ]; then
+if [ -z $webhook_url ]; then
 	echo "$0: specify discord WEBHOOK_URL env variable"
 	exit 1
 fi
