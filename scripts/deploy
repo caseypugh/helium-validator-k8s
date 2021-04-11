@@ -15,7 +15,7 @@ if [[ $CMD == "restart" ]]; then
   else
     # Just restart the pod specified
     kubectl delete pod $POD_NAME-$replica_id &
-  fi  
+  fi
 fi
 
 kubectl apply -f k8s/validator.yml

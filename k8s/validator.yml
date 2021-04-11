@@ -23,11 +23,11 @@ spec:
           args:
             - while [ -z $NAT_EXTERNAL_PORT ]; do
                 port=$(cat /etc/podinfo/annotations | grep "k8s/2154" | grep -oE "\"[0-9]+\"" | grep -oE "[0-9]+" | xargs);
-                
+
                 if [ -n "$port" ]; then
                   export NAT_EXTERNAL_IP=$(wget -qO- ifconfig.me);
                   export NAT_EXTERNAL_PORT=$port;
-                  
+
                   echo "export NAT_EXTERNAL_IP=$NAT_EXTERNAL_IP" >> ~/.profile;
                   echo "export NAT_EXTERNAL_PORT=$NAT_EXTERNAL_PORT" >> ~/.profile;
                   break;
@@ -36,7 +36,7 @@ spec:
               done;
               /opt/miner/bin/miner foreground;
 
-          env: 
+          env:
             - name: NAT_INTERNAL_PORT
               value: "2154"
             - name: NAT_INTERNAL_IP

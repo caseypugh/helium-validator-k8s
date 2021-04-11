@@ -38,7 +38,7 @@ if [[ $CMD == "sync" ]]; then
     miner_name=$(kubectl exec -it $pod -c validator -- sh -c "miner info name" | egrep -o "[a-z]+-[a-z]+-[a-z]+" | xargs)
     address=$(kubectl exec -it $pod -c validator -- sh -c "miner peer addr")
     address=$(echo $address | sed 's/\/p2p\///')
-    
+
     echo "Miner Name: $miner_name"
     echo "Miner Address: $address"
 
@@ -52,7 +52,7 @@ if [[ $CMD == "sync" ]]; then
     add_key_from_file $pod-swarm-key keys/$miner_name/swarm_key
     add_key $pod-miner-name $miner_name
     add_key $pod-miner-address $address
-    
+
     echo "Make sure you backup keys/$miner_name/swarm_key in 1password or place of choice."
   done
 
