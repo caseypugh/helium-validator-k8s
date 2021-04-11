@@ -74,4 +74,8 @@ elif [[ $CMD == "update" ]]; then
   echo "Uploading $SEALED_KEYS_PATH to the cluster"
   kubectl delete -f $SEALED_KEYS_PATH
   kubectl create -f $SEALED_KEYS_PATH
+
+else
+  echo "$0: don't understand command '$CMD'"
+  exit 1
 fi
