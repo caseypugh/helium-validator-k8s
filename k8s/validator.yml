@@ -20,9 +20,6 @@ spec:
           image: quay.io/team-helium/validator:latest-val-amd64
           imagePullPolicy: Always
           resources:
-            limits:
-              cpu: 2
-              memory: "1000Mi"
             requests:
               cpu: 1
               memory: "500Mi"
