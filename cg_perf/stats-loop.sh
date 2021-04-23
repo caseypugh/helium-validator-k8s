@@ -11,7 +11,7 @@ while [ 1 ]; do
   when=$(date +"%Y-%m-%d-%H_%M")
   outfile="$outdir/$when.csv"
   echo $outfile
-  outfile2="$outdir2/validators-$when.csv"
+  outfile2="$outdir2/validators-$when.json"
   echo $outfile2
 
   ../scripts/validator cg_perf --format=csv > $outfile
