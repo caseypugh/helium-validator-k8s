@@ -19,6 +19,10 @@ spec:
         - name: validator
           image: quay.io/team-helium/validator:latest-val-amd64
           imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 1
+              memory: "500Mi"
           command: [ "/bin/ash", "-c" ]
           args:
             - while [ -z $NAT_EXTERNAL_PORT ]; do
