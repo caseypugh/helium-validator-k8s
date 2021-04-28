@@ -1,0 +1,18 @@
+#!/bin/bash
+
+validators=$(helium-wallet validators list | sed -e '1,3d' | sed '$d' | cut -b 3-54)
+
+for val in $validators; do
+  echo -------- $val --------
+
+  stats=$(curl -s "https://testnet-api.helium.wtf/v1/validators/$val/rewards/sum?min_time=-7%20day&bucket=day")
+  # echo $stats | jq
+
+  for i in 0 1 2 3 4 5 6; do 
+    echo -n "$i: "
+    echo $stats | jq ".data[$i] .total"
+  done
+
+  echo
+  sleep 1 # be nice to testnet API
+done
