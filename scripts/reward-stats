@@ -8,7 +8,7 @@ for val in $validators; do
   info=$(curl -s "https://testnet-api.helium.wtf/v1/validators/$val")
   name=$(echo $info | jq -r '.data .name')
 
-  stats=$(curl -s "https://testnet-api.helium.wtf/v1/validators/$val/rewards/sum?min_time=-7%20day&bucket=day")
+  stats=$(curl -s "https://testnet-api.helium.wtf/v1/validators/$val/rewards/sum?min_time=-30%20day&bucket=day")
   # echo $stats | jq
 
   echo -n "$name,$val,"
