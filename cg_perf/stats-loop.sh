@@ -10,6 +10,7 @@ while [ 1 ]; do
   echo $outfile
 
   ../scripts/validator cg_perf --format=csv > $outfile
+  ../scripts/validator ledger_validators > data-ledger/$when
 
   sleep 60
 done
