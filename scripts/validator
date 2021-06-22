@@ -34,27 +34,27 @@ if [[ $CMD == "update" ]]; then
     exit 0
   fi
 
-  miner_latest_name=$(echo "$miner_quay" | grep -v HTTP_Response | jq -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH)and contains("_val")) ][0].name' | cut -d'"' -f2)
-  miner_latest_version=$(echo $miner_latest_name | egrep -o "[0-9]+.[0-9]+.[0-9]+" | xargs)
-  container_version=$(container_validator_version 0)
+  miner_latest_name=$(echo "$miner_quay" | grep -v HTTP_Response | jq -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH) and contains("latest-val-")) ][0].name' | cut -d'"' -f2)
+  miner_latest_sha=$(echo "$miner_quay" | grep -v HTTP_Response | jq -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH) and contains("latest-val-")) ][0].manifest_digest' | cut -d'"' -f2)
 
-  # echo $MINER_VERSION
-  # echo $miner_quay
-  # echo $miner_response
-  # echo $miner_latest
+  container_version=$(container_validator_version 0)
+  container_version_sha=$(echo "$miner_quay" | grep -v HTTP_Response | jq -c --arg ARCH "$ARCH" --arg VER "$container_version" '[ .tags[] | select( .name | contains($ARCH) and contains($VER)) ][0].manifest_digest' | cut -d'"' -f2)
+  
+  # echo "$miner_latest_name: $miner_latest_sha"
+  # echo "$container_version: $container_version_sha"
 
   if [ -z "$container_version" ]; then
     echo "Validator is not up right now. Try again later"
     exit 0
   fi
 
-  if [[ $miner_latest_version == $container_version ]]; then
+  if [[ $container_version_sha == $miner_latest_sha ]]; then
     echo "Already at latest version: $container_version"
   else
     echo "Out of date!"
-    echo "Latest version: $miner_latest_version"
-    echo "Container version: $container_version"
-
+    echo "Latest version: $miner_latest_sha"
+    echo "Container version: $container_version_sha ($container_version)"
+    exit
     scripts/deploy restart
   fi
 

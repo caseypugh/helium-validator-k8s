@@ -6,3 +6,5 @@ sshpass
 keys/*
 keys.yml
 wallet.key
+kubectl
+kubectl.sha256
