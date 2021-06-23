@@ -5,6 +5,6 @@ cg_perf/data*
 sshpass
 keys/*
 keys.yml
-wallet.key
+*.key
 kubectl
 kubectl.sha256
