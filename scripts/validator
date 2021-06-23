@@ -117,8 +117,8 @@ elif [[ $CMD == "stake" ]]; then
     echo "$0: missing path to wallet"
     exit 1
   elif [ -z $amount ]; then
-    echo "$0: specify amount of TNT to stake"
-    exit 1
+    echo "No amount specified, assuming 10,000 HNT"
+    amount=10000
   fi
 
   address=$(get_miner_address $pod_id)
@@ -127,7 +127,7 @@ elif [[ $CMD == "stake" ]]; then
   echo "Wallet path: $wallet_path"
   echo "Stake amount: $amount"
 
-  helium-wallet -f $wallet_path validators stake $address $amount --commit
+  helium-wallet -f $wallet_path validators stake one $address $amount --commit
 
   echo; echo "Staked! Visit https://testnet-api.helium.wtf/v1/validators/$address to see the status"
 
