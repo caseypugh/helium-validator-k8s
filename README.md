@@ -1,20 +1,59 @@
-# Environment Setup
+# Helium Validators on Kubernetes (k8s)
+
+This is a DigitalOcean-specific [Kubernetes (k8s)](https://kubernetes.io/) setup for running a cluster of [Helium validators](https://www.helium.com/stake)
+
+Some modifications are necessary to run on other Kubernetes hosts
+
+Development is still early and pull requests are welcome
+
+# Setup on your computer
 
 - Install `brew install kubectl` (or [Linux/Windows](https://kubernetes.io/docs/tasks/tools/))
-- Install kubeseal: `brew install kubeseal` (or [Linux](https://github.com/bitnami-labs/sealed-secrets/releases/tag/v0.15.0))
 - Install doctl: `brew install doctl` (or [Linux/Windows](https://www.digitalocean.com/docs/apis-clis/doctl/how-to/install/))
 - Create a [new API token](https://cloud.digitalocean.com/account/api/tokens/new) for yourself on Digital Ocean
-- Init doctl & kubernetes cluser access on your computer
+- Init doctl & kubernetes cluster access on your computer
+
+In the DO web interface, create a new Kubernetes cluster i.e. 'helium-cluster'
+
+Then use the `doctl` tool to download that cluster's config file locally, for use with `kubectl`:
 
 ```sh
-doctl auth init --context loris
+doctl auth init --context helium
 Enter your access token: <API TOKEN HERE>
 
-# now switch to the loris context
-doctl auth switch --context loris
+# now switch to the 'helium-cluster' context
+doctl auth switch --context helium
 
-# Download kubeconfig with doctl
+# Download cluster's config file with doctl
 doctl kubernetes cluster kubeconfig save helium-cluster
+```
+
+# Cluster Setup
+
+## Setup Automatic Updates
+
+In order for [automatic miner updates](https://github.com/caseypugh/helium-validator/blob/main/.github/workflows/update-validator.yml) to work, you need to give set the `DIGITALOCEAN_ACCESS_TOKEN` in [GitHub Secrets](https://github.com/caseypugh/helium-validator/settings/secrets/actions) so the action can run.
+
+You can manually trigger an update by visiting the [Validator Updater](https://github.com/caseypugh/helium-validator/actions/workflows/update-validator.yml) and then click `Run workflow`.
+
+(TODO, move this to a k8s job)
+
+## Setup Dynamic Ports
+
+[Install dynamic host ports](https://github.com/0blu/dynamic-hostports-k8s) so that each miner can have a unique port assigned to each pod
+
+```sh
+kubectl apply -f https://raw.githubusercontent.com/0blu/dynamic-hostports-k8s/master/deploy.yaml
+```
+
+## Apply the validator config
+
+Then, lastly, setup the actual validator cluster:
+
+```sh
+kubectl apply -f k8s/validator.yml
+# or alternately,
+scripts/deploy
 ```
 
 You're all set! Try running `kubectl get pods` to see if everything is working. You should see something like:
@@ -24,43 +63,19 @@ NAME          READY   STATUS    RESTARTS   AGE
 validator-0   2/2     Running   0          16h
 ```
 
-# Cluster Setup
-
-This is already done but writing just in case we need to do it again.
-
-### Secrets setup
-
-Install [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets/releases) into the cluster
+To watch what is going on in the cluster:
 
 ```sh
-kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.15.0/controller.yaml
+kubectl get events --all-namespaces --watch
 ```
 
-And then you'll need to make sure your public cert is the same as the server's:
-
-```
-kubeseal --fetch-cert >cert.pem
-```
-
-Afterward you'll need to update `sealed-keys.yml` (TODO) and then publish the updates with `./scripts/swarm-keys update`
-
-### Automatic updates
-
-In order for [automatic miner updates](https://github.com/caseypugh/helium-validator/blob/main/.github/workflows/update-validator.yml) to work, you need to give set the `DIGITALOCEAN_ACCESS_TOKEN` in [Github Secrets](https://github.com/caseypugh/helium-validator/settings/secrets/actions) so the action can run.
-
-You can manually trigger an update by visiting the [Validator Updater](https://github.com/caseypugh/helium-validator/actions/workflows/update-validator.yml) and then click `Run workflow`.
-
-(TODO, move this to a k8s job)
-
-### Dynamic Ports
-
-[Install dynamic host ports](https://github.com/0blu/dynamic-hostports-k8s) so that each miner can have a unique port assigned to each pod
+To fetch logs from one of the validators, to see what's going on:
 
 ```sh
-kubectl apply -f https://raw.githubusercontent.com/0blu/dynamic-hostports-k8s/master/deploy.yaml
+kubectl logs validator-0 validator
 ```
 
-# Adding a new validator
+# Adding another validator
 
 - Edit `k8s/validator.yml` and increment `spec.replicas`
 - Run `scripts/deploy` to launch the new validator
@@ -68,15 +83,17 @@ kubectl apply -f https://raw.githubusercontent.com/0blu/dynamic-hostports-k8s/ma
 
 ## Managing swarm keys
 
-Once the validator is running, make sure to download the swarm key: `scripts/swarm-keys sync`.
+A validator will generate a swarm_key for itself when it is first created. If you'd like to download those keys, run:
 
-This will place the key into `keys/$miner_name/swarm_key` and will also encrypt that key into `sealed-keys.yml`. Make sure the yml file gets committed.
+```sh
+scripts/swarm-keys sync
+```
 
-Also store the swarm_key in 1password if you want via `cat swarm_key | base64`
+You can also store a base64-encoded swarm_key in a password manager like 1Password if you want: `cat swarm_key | base64`
 
-### Swapping out a swarm key
+## Upload swarm_key to validator
 
-If you want to update a swarm key, then run:
+To copy a local swarm_key file to a particular validator, run:
 
 ```sh
 scripts/swarm-keys swap $replica_id $path_to_swarm_key
@@ -85,14 +102,37 @@ scripts/swarm-keys swap $replica_id $path_to_swarm_key
 # scripts/swarm-keys swap 1 ~/swarm_key
 ```
 
-This will automatically update the keys, update `sealed-keys.yml`, and restart the specified pod.
+This will update the keys and restart the specified pod.
 
-# Monitoring
+
+# Optional - k8s web dashboard
+
+DigitalOcean runs the web dashboard for you, but if you're running locally or on another host that doesn't have it, run:
+
+```sh
+scripts/setup-dashboard
+```
+
+# Optional - kube-prometheus-stack (monitoring)
+
+And if you want to wire up prometheus/grafana/alertmanager using the `kube-prometheus-stack` helm chart, in
+a manner similar to DigitalOcean:
+
+```sh
+scripts/setup-monitoring install
+```
+
+You can also upgrade an existing kube-prometheus-stack install with this script:
+
+```
+scripts/setup-monitoring upgrade
+```
+
+# Monitoring & alerts (Grafana)
 
 See [Kubernetes Monitoring Stack](https://marketplace.digitalocean.com/apps/kubernetes-monitoring-stack) details on how to access Grafana. But tl;dr:
 
 ```sh
 kubectl port-forward svc/kube-prometheus-stack-grafana 8080:80 -n kube-prometheus-stack
 ```
-
 Grafana instance will now be available at <http://localhost:8080>.

@@ -1,0 +1,50 @@
+#!/bin/bash
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml 
+# To remove this, just use: 
+# kubectl delete -f //raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+
+# generate user and login using:
+# https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/creating-sample-user.md
+
+# step 1
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+EOF
+
+# step 2
+cat <<EOF | kubectl apply -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kubernetes-dashboard
+EOF
+
+# then fetch token for user created by above
+echo "Copy this token:"
+echo
+kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}"; echo
+
+echo
+
+# Then tell user to run dashboard
+echo "Then run:"
+echo "kubectl proxy"
+echo
+echo "Then visit:"
+echo "http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/login"
+echo
+echo "And paste in the user token above to login"
+echo "Good luck!"

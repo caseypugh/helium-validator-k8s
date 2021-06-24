@@ -146,6 +146,9 @@ elif [[ $CMD == "kickstart" ]]; then
   pod_id=$2
   kubectl exec -it validator-$pod_id -c validator -- sh -c "miner peer connect /ip4/3.137.173.26/tcp/2154"
 
+elif [[ $CMD == "top" ]]; then
+  kubectl top pods --all-namespaces 
+
 else
   echo "$0: unknown command \"$CMD\" - (update|info|peers|cg_perf|bash|logs|stake|reset_db|kickstart)"
   exit 1

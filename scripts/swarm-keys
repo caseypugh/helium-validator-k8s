@@ -2,30 +2,6 @@
 
 CMD=$1
 KEY_NAME=swarm-keys
-SEALED_KEYS_PATH=k8s/sealed-keys.yml
-
-add_key_from_file()
-{
-  key=$1
-  file=$2
-
-  if test -f $SEALED_KEYS_PATH; then
-    kubectl create secret generic $KEY_NAME --dry-run=client --from-file=$key=$file -o yaml \
-      | kubeseal --merge-into $SEALED_KEYS_PATH --format yaml --cert cert.pem
-  else
-    kubectl create secret generic $KEY_NAME --dry-run=client --from-file=$key=$file -o yaml \
-      | kubeseal > $SEALED_KEYS_PATH --format yaml --cert cert.pem
-  fi
-}
-
-add_key()
-{
-  key=$1
-  value=$2
-
-  kubectl create secret generic $KEY_NAME --dry-run=client --from-literal=$key=$value -o yaml \
-    | kubeseal --merge-into $SEALED_KEYS_PATH --format yaml --cert cert.pem
-}
 
 if [[ $CMD == "sync" ]]; then
   echo; echo "Downloading swarm_keys from cluster..."
@@ -47,12 +23,6 @@ if [[ $CMD == "sync" ]]; then
 
     kubectl cp $pod:/var/data/miner/swarm_key keys/$miner_name/swarm_key -c validator
 
-    echo; echo "Adding $miner_name swarm_key to $SEALED_KEYS_PATH"
-
-    add_key_from_file $pod-swarm-key keys/$miner_name/swarm_key
-    add_key $pod-miner-name $miner_name
-    add_key $pod-miner-address $address
-
     echo "Make sure you backup keys/$miner_name/swarm_key in 1password or place of choice."
   done
 
@@ -61,7 +31,6 @@ elif [[ $CMD == "swap" ]]; then
   swarm_key_file_path=$3
   pod=validator-$replica_id
 
-  add_key_from_file $pod-swarm-key $swarm_key_file_path
   echo; echo "Copying $swarm_key_file_path to $pod."
   kubectl cp $swarm_key_file_path $pod:/var/data/miner/swarm_key -c validator
 
@@ -69,11 +38,6 @@ elif [[ $CMD == "swap" ]]; then
 
   echo "Restarting $pod..."
   scripts/deploy restart $replica_id
-
-elif [[ $CMD == "update" ]]; then
-  echo "Uploading $SEALED_KEYS_PATH to the cluster"
-  kubectl delete -f $SEALED_KEYS_PATH
-  kubectl create -f $SEALED_KEYS_PATH
 
 else
   echo "$0: don't understand command '$CMD'"
