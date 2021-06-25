@@ -6,7 +6,6 @@ cd $SCRIPT_DIR
 source ../../.env
 source ../helper
 
-NAMESPACE=default
 CONFIG_PATH=../../grafana/configs
 panel_id=1
 

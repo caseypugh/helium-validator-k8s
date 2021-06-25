@@ -16,6 +16,7 @@ if [ ! -z $hasop ] && [ ! -z $OP_VAULT_UUID ]; then
       echo "Failed to sign in."
       exit 1
     fi
+    op_logged_in=1
   else
     echo "Signed into 1Password CLI"
   fi
