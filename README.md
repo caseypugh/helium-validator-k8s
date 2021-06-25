@@ -159,7 +159,10 @@ A validator will generate a `swarm_key` for itself when it is first created. If 
 scripts/swarm-keys sync
 ```
 
-You can also store a base64-encoded swarm_key in a password manager like 1Password if you want. e.g. `echo "$(cat swarm_key)" | base64`
+If you have [1Password CLI](https://1password.com/downloads/command-line/) installed, this script can automatically save all the swarm_keys to your vault! Get your vault's `UUID` and set the `OP_VAULT_UUID` in your `.env` file. Here's a quick way to fetch a UUID for your Personal vault:
+```sh
+op list vaults | jq -r '.[] | select(.name == "Private") | .uuid'
+```
 
 ## Replace a swarm key
 
