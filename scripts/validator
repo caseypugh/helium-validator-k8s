@@ -1,5 +1,5 @@
 #!/bin/bash
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 cd $SCRIPT_DIR
 
 CMD=$1
@@ -17,12 +17,12 @@ if [[ $CMD == "update" ]]; then
     exit 0
   fi
 
-  miner_latest_name=$(echo "$miner_quay" | grep -v HTTP_Response | jq -r -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH) and contains("latest-val-")) ][0].name')
-  miner_latest_sha=$(echo "$miner_quay" | grep -v HTTP_Response | jq -r -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH) and contains("latest-val-")) ][0].manifest_digest')
+  miner_latest_name=$(echo "$miner_quay" | grep -v HTTP_Response | jq -r -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH) and contains("latest-validator-")) ][0].name')
+  miner_latest_sha=$(echo "$miner_quay" | grep -v HTTP_Response | jq -r -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH) and contains("latest-validator-")) ][0].manifest_digest')
 
   container_version=$(container_validator_version 0)
   container_version_sha=$(echo "$miner_quay" | grep -v HTTP_Response | jq -r -c --arg ARCH "$ARCH" --arg VER "$container_version" '[ .tags[] | select( .name | contains($ARCH) and contains($VER)) ][0].manifest_digest')
-  
+
   # echo "$miner_latest_name: $miner_latest_sha"
   # echo "$container_version: $container_version_sha"
 
@@ -50,7 +50,7 @@ elif [[ $CMD == "info" ]]; then
     validator_count=$((replica_id + 1))
   fi
 
-  for ((i = $start_index ; i < $validator_count ; i++)); do
+  for ((i = $start_index; i < $validator_count; i++)); do
     pod="validator-$i"
     echo; echo "Pod: $pod"
 
@@ -76,7 +76,7 @@ elif [[ $CMD == "info" ]]; then
 elif [[ $CMD == "peers" ]]; then
   # FIXME DRY up this "with each validator" loop
   validator_count=$(kubectl get pods | grep -c "validator")
-  for ((i = 0 ; i < $validator_count ; i++)); do
+  for ((i = 0; i < $validator_count; i++)); do
     pod="validator-$i"
     echo; echo "Pod: $pod"
     kubectl exec -it $pod -c validator -- sh -c "miner peer book -s"
@@ -138,7 +138,7 @@ elif [[ $CMD == "kickstart" ]]; then
   kubectl exec -it validator-$pod_id -c validator -- sh -c "miner peer connect /ip4/3.137.173.26/tcp/2154"
 
 elif [[ $CMD == "top" ]]; then
-  kubectl top pods --all-namespaces 
+  kubectl top pods --all-namespaces
 
 else
   echo "$0: unknown command \"$CMD\" - (update|info|peers|cg_perf|bash|logs|stake|reset_db|kickstart)"

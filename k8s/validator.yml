@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: validator
-          image: quay.io/team-helium/validator:latest-val-amd64
+          image: quay.io/team-helium/validator:latest-validator-amd64
           imagePullPolicy: Always
           resources:
             requests:
