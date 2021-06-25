@@ -8,7 +8,7 @@ Development is still early and pull requests are welcome!
 
 ### Table of contents
 - [Local environment setup](#local-environment-setup)
-- [Cluster setup](#local-environment-setup)
+- [Cluster setup](#cluster-setup)
     - [Dynamic ports](#dynamic-ports)
     - [Install validator config](#install-validator-config)
     - [Automatic updates](#automatic-updates)
@@ -159,7 +159,7 @@ A validator will generate a `swarm_key` for itself when it is first created. If 
 scripts/swarm-keys sync
 ```
 
-You can also store a base64-encoded swarm_key in a password manager like 1Password if you want: `cat swarm_key | base64`
+You can also store a base64-encoded swarm_key in a password manager like 1Password if you want. e.g. `echo "$(cat swarm_key)" | base64`
 
 ## Replace a swarm key
 
