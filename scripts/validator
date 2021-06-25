@@ -17,11 +17,11 @@ if [[ $CMD == "update" ]]; then
     exit 0
   fi
 
-  miner_latest_name=$(echo "$miner_quay" | grep -v HTTP_Response | jq -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH) and contains("latest-val-")) ][0].name' | cut -d'"' -f2)
-  miner_latest_sha=$(echo "$miner_quay" | grep -v HTTP_Response | jq -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH) and contains("latest-val-")) ][0].manifest_digest' | cut -d'"' -f2)
+  miner_latest_name=$(echo "$miner_quay" | grep -v HTTP_Response | jq -r -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH) and contains("latest-val-")) ][0].name')
+  miner_latest_sha=$(echo "$miner_quay" | grep -v HTTP_Response | jq -r -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH) and contains("latest-val-")) ][0].manifest_digest')
 
   container_version=$(container_validator_version 0)
-  container_version_sha=$(echo "$miner_quay" | grep -v HTTP_Response | jq -c --arg ARCH "$ARCH" --arg VER "$container_version" '[ .tags[] | select( .name | contains($ARCH) and contains($VER)) ][0].manifest_digest' | cut -d'"' -f2)
+  container_version_sha=$(echo "$miner_quay" | grep -v HTTP_Response | jq -r -c --arg ARCH "$ARCH" --arg VER "$container_version" '[ .tags[] | select( .name | contains($ARCH) and contains($VER)) ][0].manifest_digest')
   
   # echo "$miner_latest_name: $miner_latest_sha"
   # echo "$container_version: $container_version_sha"

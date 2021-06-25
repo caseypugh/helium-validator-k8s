@@ -36,20 +36,20 @@ function load_panel {
 
 # Fetch the UID of our dashboard
 response=$(api /api/search?query=Helium+Validator)
-dash_uid=$(echo $response | jq -c '[ .[] | select( .title | contains("Helium Validator")) ][0].uid' | cut -d'"' -f2)
+dash_uid=$(echo $response | jq -r -c '[ .[] | select( .title | contains("Helium Validator")) ][0].uid')
 
 if [[ $dash_uid == "null" ]] || [ -z $dash_uid ]; then
   echo "No Helium dashboard found. Creating a new one..."
   dash_uid=
 else 
   response=$(api /api/dashboards/uid/$dash_uid)
-  dash_version=$(echo $response | jq -c '[ .dashboard ][0].version' | cut -d'"' -f2)
+  dash_version=$(echo $response | jq -r -c '[ .dashboard ][0].version')
   echo "Updating existing Helium Dashboard (v$dash_version)"
 fi
 
 notification_uid=
 if [ ! -z $GRAFANA_NOTIFICATION_CHANNEL ]; then
-  notification_uid=$(api /api/alert-notifications | jq ".[] | select(.id == $GRAFANA_NOTIFICATION_CHANNEL) | .uid" | cut -d'"' -f2)
+  notification_uid=$(api /api/alert-notifications | jq -r ".[] | select(.id == $GRAFANA_NOTIFICATION_CHANNEL) | .uid")
 fi
 
 # Setup the dashboard
