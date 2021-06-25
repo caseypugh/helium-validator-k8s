@@ -17,7 +17,7 @@ if [ ! -z $hasop ] && [ ! -z $OP_VAULT_UUID ]; then
       exit 1
     fi
   else
-    echo "Already signed into 1password."
+    echo "Signed into 1Password CLI"
   fi
 fi
 
@@ -44,7 +44,7 @@ if [[ $CMD == "sync" ]]; then
 
     # Save to 1password
     if [ ! -z $op_logged_in ]; then 
-      swarm_key_base64=$(echo "$(tr -d '\0' < $swarm_key_path)" | base64)
+      swarm_key_base64=$(base64 -w 0 $swarm_key_path)
       validator_login_title="$miner_name swarm_key"
 
       uuid=$(op list items | jq -r --arg title "$validator_login_title" '[.[] | select(.overview.title | contains($title))][0] | .uuid')
@@ -60,16 +60,51 @@ if [[ $CMD == "sync" ]]; then
   done
 
 
-elif [[ $CMD == "swap" ]]; then
+elif [[ $CMD == "replace" ]]; then
   replica_id=$2
+
+  if [ -z $replica_id ]; then
+    echo "Please specify a replica_id"
+    exit 1
+  fi
+
   swarm_key_file_path=$3
-  pod=validator-$replica_id
+  miner_name=
 
-  echo; echo "Copying $swarm_key_file_path to $pod."
-  kubectl cp $swarm_key_file_path $pod:/var/data/miner/swarm_key -c validator
+  # If using 1password and file isnt found, assume 3rd argument is miner name
+  if [ ! -f $swarm_key_file_path ]; then
+    miner_name=$swarm_key_file_path
 
-  echo "Restarting $pod..."
-  scripts/deploy restart $replica_id
+    if [ ! -z $op_logged_in ]; then 
+      echo "Fetching swarm_key for $miner_name from 1Password"
+      swarm_key_uuid=$(op list items | jq -r --arg title "$miner_name swarm_key" '[.[] | select(.overview.title | contains($title))][0] | .uuid')
+
+      if [[ $swarm_key_uuid == "null" ]]; then
+        echo "No swarm_key found!"
+        exit 1
+      fi
+
+      # Decode the swarm_key into a tmp file
+      op get item $swarm_key_uuid --fields password | base64 -d > tmp_swarm_key
+
+      swarm_key_file_path=tmp_swarm_key
+    else
+      echo "File not found"
+      swarm_key_file_path=
+    fi
+  fi
+
+  if [ -f $swarm_key_file_path ]; then
+    pod=validator-$replica_id
+
+    echo; echo "Uploading swarm_key to $pod."
+    kubectl cp $swarm_key_file_path $pod:/var/data/miner/swarm_key -c validator
+
+    echo "Restarting $pod..."
+    scripts/deploy restart $replica_id
+
+    rm tmp_swarm_key 2> /dev/null
+  fi
 
 else
   echo "$0: don't understand command '$CMD'"

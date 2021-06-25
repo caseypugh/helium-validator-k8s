@@ -169,13 +169,18 @@ op list vaults | jq -r '.[] | select(.name == "Private") | .uuid'
 To copy a local swarm_key file to a particular validator replica, run:
 
 ```sh
-scripts/swarm-keys swap $replica_id $path_to_swarm_key
+scripts/swarm-keys replace $replica_id $path_to_swarm_key
 
 # For example
-scripts/swarm-keys swap 1 ~/swarm_key
+scripts/swarm-keys replace 1 ~/path/to/swarm_key
 ```
 
-This will update the keys and restart the specified pod.
+And if you have the 1Password CLI setup (as described earlier), then you can use the name of your validator instead:
+```sh
+scripts/swarm-keys replace $replica_id animal-hotspot-name
+```
+
+This will update the swarm_key and restart the specified pod replica.
 
 
 # Kubernetes Dashboard (Optional)
