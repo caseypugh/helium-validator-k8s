@@ -66,14 +66,8 @@ spec:
               mountPath: /var/data
             - name: podinfo
               mountPath: /etc/podinfo
-            - name: miner
-              mountPath: /etc/miner
 
       volumes:
-        - name: miner
-          secret:
-            secretName: swarm-keys
-            defaultMode: 0400
         - name: podinfo
           downwardAPI:
             items:

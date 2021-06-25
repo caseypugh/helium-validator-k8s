@@ -1,0 +1,143 @@
+{
+  "id": 3,
+  "gridPos": {
+    "h": 7,
+    "w": 6,
+    "x": 0,
+    "y": 0
+  },
+  "type": "timeseries",
+  "title": "",
+  "pluginVersion": "8.0.1",
+  "maxDataPoints": 100,
+  "links": [],
+  "fieldConfig": {
+    "defaults": {
+      "custom": {
+        "drawStyle": "line",
+        "lineInterpolation": "linear",
+        "barAlignment": 0,
+        "lineWidth": 1,
+        "fillOpacity": 16,
+        "gradientMode": "none",
+        "spanNulls": false,
+        "showPoints": "auto",
+        "pointSize": 5,
+        "stacking": {
+          "mode": "normal",
+          "group": "A"
+        },
+        "axisPlacement": "auto",
+        "axisLabel": "",
+        "scaleDistribution": {
+          "type": "linear"
+        },
+        "hideFrom": {
+          "tooltip": false,
+          "viz": false,
+          "legend": false
+        },
+        "thresholdsStyle": {
+          "mode": "off"
+        },
+        "lineStyle": {
+          "fill": "solid"
+        }
+      },
+      "color": {
+        "mode": "palette-classic"
+      },
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {
+            "color": "rgba(50, 172, 45, 0.97)",
+            "value": null
+          },
+          {
+            "color": "rgba(237, 129, 40, 0.89)",
+            "value": 80
+          },
+          {
+            "color": "rgba(245, 54, 54, 0.9)",
+            "value": 90
+          }
+        ]
+      },
+      "mappings": [],
+      "max": 100,
+      "min": 0,
+      "unit": "percent"
+    },
+    "overrides": []
+  },
+  "options": {
+    "tooltip": {
+      "mode": "single"
+    },
+    "legend": {
+      "displayMode": "hidden",
+      "placement": "bottom",
+      "calcs": []
+    }
+  },
+  "targets": [
+    {
+      "expr": "max without(instance,node) (\n(\n topk(1, kubelet_volume_stats_capacity_bytes{job=\"kubelet\", metrics_path=\"/metrics\", persistentvolumeclaim=\"{{pvc}}\"})\n -\n topk(1, kubelet_volume_stats_available_bytes{job=\"kubelet\", metrics_path=\"/metrics\", persistentvolumeclaim=\"{{pvc}}\"})\n)\n/\ntopk(1, kubelet_volume_stats_capacity_bytes{job=\"kubelet\", metrics_path=\"/metrics\", persistentvolumeclaim=\"{{pvc}}\"})\n* 100)\n",
+      "legendFormat": "Used Space",
+      "interval": "",
+      "exemplar": true,
+      "format": "time_series",
+      "intervalFactor": 2,
+      "refId": "A"
+    }
+  ],
+  "thresholds": [
+    {
+      "value": 76,
+      "op": "gt",
+      "visible": true,
+      "colorMode": "critical"
+    }
+  ],
+  "alert": {
+    "conditions": [
+      {
+        "type": "query",
+        "query": {
+          "params": [
+            "A",
+            "5m",
+            "now"
+          ]
+        },
+        "reducer": {
+          "type": "avg",
+          "params": []
+        },
+        "evaluator": {
+          "type": "gt",
+          "params": [
+            76
+          ]
+        },
+        "operator": {
+          "type": "and"
+        }
+      }
+    ],
+    "noDataState": "no_data",
+    "executionErrorState": "alerting",
+    "frequency": "1m",
+    "handler": 1,
+    "notifications": [],
+    "for": "1m",
+    "alertRuleTags": {},
+    "name": "",
+    "message": "Running low on space."
+  },
+  "cacheTimeout": null,
+  "interval": null,
+  "description": "",
+  "datasource": null
+}

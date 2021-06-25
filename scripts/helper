@@ -1,0 +1,21 @@
+#!/bin/bash
+POD_NAME=validator
+CONTAINER_NAME=validator
+
+container_validator_version()
+{
+  replica=$1
+  kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -- /bin/sh -c "miner versions" | egrep -o "[0-9]+.[0-9]+.[0-9]+" | xargs
+}
+
+get_miner_name()
+{
+  replica=$1
+  kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -- sh -c "miner info name" | egrep -o "[a-z]+-[a-z]+-[a-z]+" | xargs
+}
+
+get_miner_address()
+{
+  replica=$1
+  kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -- sh -c "miner peer addr" | grep -oE "[0-9a-zA-Z]{6,}"
+}

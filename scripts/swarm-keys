@@ -34,8 +34,6 @@ elif [[ $CMD == "swap" ]]; then
   echo; echo "Copying $swarm_key_file_path to $pod."
   kubectl cp $swarm_key_file_path $pod:/var/data/miner/swarm_key -c validator
 
-  scripts/swarm-keys update
-
   echo "Restarting $pod..."
   scripts/deploy restart $replica_id
 

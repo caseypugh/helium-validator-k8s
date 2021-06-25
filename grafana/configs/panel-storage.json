@@ -1,0 +1,138 @@
+{
+    "id": 0,
+    "gridPos": {
+      "h": 9,
+      "w": 12,
+      "x": 0,
+      "y": 0
+    },
+    "type": "graph",
+    "title": "",
+    "alert": {
+      "alertRuleTags": {},
+      "conditions": [
+        {
+          "evaluator": {
+            "params": [
+              18857055667
+            ],
+            "type": "gt"
+          },
+          "operator": {
+            "type": "and"
+          },
+          "query": {
+            "params": [
+              "Used Space",
+              "10s",
+              "now"
+            ]
+          },
+          "reducer": {
+            "params": [],
+            "type": "avg"
+          },
+          "type": "query"
+        }
+      ],
+      "executionErrorState": "alerting",
+      "for": "1m",
+      "frequency": "1m",
+      "handler": 1,
+      "message": "Running low on space",
+      "name": "attractive-vermilion-urchin #0 storage alert",
+      "noDataState": "no_data",
+      "notifications": [
+      ]
+    },
+    "thresholds": [],
+    "pluginVersion": "8.0.1",
+    "legend": {
+      "alignAsTable": true,
+      "avg": true,
+      "current": true,
+      "max": true,
+      "min": true,
+      "show": true,
+      "total": false,
+      "values": true
+    },
+    "aliasColors": {},
+    "dashLength": 10,
+    "fill": 1,
+    "lines": true,
+    "linewidth": 1,
+    "nullPointMode": "null",
+    "options": {
+      "alertThreshold": true
+    },
+    "pointradius": 2,
+    "renderer": "flot",
+    "seriesOverrides": [],
+    "spaceLength": 10,
+    "stack": true,
+    "targets": [
+      {
+        "exemplar": true,
+        "expr": "(\n  sum without(instance, node) (topk(1, (kubelet_volume_stats_capacity_bytes{job=\"kubelet\", metrics_path=\"/metrics\", namespace=\"{{namespace}}\", persistentvolumeclaim=\"{{pvc}}\"})))\n  -\n  sum without(instance, node) (topk(1, (kubelet_volume_stats_available_bytes{job=\"kubelet\", metrics_path=\"/metrics\", namespace=\"{{namespace}}\", persistentvolumeclaim=\"{{pvc}}\"})))\n)\n",
+        "interval": "",
+        "legendFormat": "Used Space",
+        "refId": "Used Space"
+      },
+      {
+        "exemplar": true,
+        "expr": "sum without(instance, node) (topk(1, (kubelet_volume_stats_available_bytes{job=\"kubelet\", metrics_path=\"/metrics\", namespace=\"{{namespace}}\", persistentvolumeclaim=\"{{pvc}}\"})))\n",
+        "hide": false,
+        "interval": "",
+        "legendFormat": "Free Space",
+        "refId": "B"
+      }
+    ],
+    "timeRegions": [],
+    "tooltip": {
+      "shared": false,
+      "sort": 0,
+      "value_type": "individual"
+    },
+    "xaxis": {
+      "buckets": null,
+      "mode": "time",
+      "name": null,
+      "show": true,
+      "values": []
+    },
+    "yaxes": [
+      {
+        "$$hashKey": "object:111",
+        "format": "bytes",
+        "label": null,
+        "logBase": 1,
+        "max": null,
+        "min": "0",
+        "show": true
+      },
+      {
+        "$$hashKey": "object:112",
+        "format": "bytes",
+        "label": null,
+        "logBase": 1,
+        "max": null,
+        "min": "0",
+        "show": true
+      }
+    ],
+    "yaxis": {
+      "align": false,
+      "alignLevel": null
+    },
+    "bars": false,
+    "dashes": false,
+    "fillGradient": 0,
+    "hiddenSeries": false,
+    "percentage": false,
+    "points": false,
+    "steppedLine": false,
+    "timeFrom": null,
+    "timeShift": null,
+    "datasource": null
+}

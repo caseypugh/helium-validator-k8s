@@ -1,0 +1,93 @@
+{
+    "id": 11,
+    "gridPos": {
+      "x": 12,
+      "y": 45,
+      "w": 12,
+      "h": 7
+    },
+    "type": "graph",
+    "title": "Transmit Bandwidth",
+    "datasource": "default",
+    "thresholds": [],
+    "links": [],
+    "legend": {
+      "avg": false,
+      "current": false,
+      "max": false,
+      "min": false,
+      "show": true,
+      "total": false,
+      "values": false
+    },
+    "aliasColors": {},
+    "bars": false,
+    "dashLength": 10,
+    "dashes": false,
+    "fill": 10,
+    "lines": true,
+    "linewidth": 0,
+    "nullPointMode": "null as zero",
+    "percentage": false,
+    "pointradius": 5,
+    "points": false,
+    "renderer": "flot",
+    "seriesOverrides": [],
+    "spaceLength": 10,
+    "stack": true,
+    "steppedLine": false,
+    "targets": [
+      {
+        "expr": "sum(irate(container_network_transmit_bytes_total{namespace=~\"{{namespace}}\"}[$__rate_interval])) by (pod)",
+        "format": "time_series",
+        "intervalFactor": 2,
+        "legendFormat": "{{pod}}",
+        "legendLink": null,
+        "step": 10,
+        "refId": "A"
+      }
+    ],
+    "timeFrom": null,
+    "timeShift": null,
+    "tooltip": {
+      "shared": false,
+      "sort": 0,
+      "value_type": "individual"
+    },
+    "xaxis": {
+      "buckets": null,
+      "mode": "time",
+      "name": null,
+      "show": true,
+      "values": []
+    },
+    "yaxes": [
+      {
+        "format": "Bps",
+        "label": null,
+        "logBase": 1,
+        "max": null,
+        "min": 0,
+        "show": true
+      },
+      {
+        "format": "short",
+        "label": null,
+        "logBase": 1,
+        "max": null,
+        "min": null,
+        "show": false
+      }
+    ],
+    "options": {
+      "alertThreshold": true
+    },
+    "pluginVersion": "8.0.1",
+    "yaxis": {
+      "align": false,
+      "alignLevel": null
+    },
+    "fillGradient": 0,
+    "hiddenSeries": false,
+    "timeRegions": []
+  }

@@ -1,29 +1,12 @@
 #!/bin/bash
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd $SCRIPT_DIR
 
 CMD=$1
 QUAY_URL='https://quay.io/api/v1/repository/team-helium/validator/tag/?limit=20&page=1&onlyActiveTags=true'
 ARCH=amd
-POD_NAME=validator
-CONTAINER_NAME=validator
 
-container_validator_version()
-{
-  replica=$1
-  kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -- /bin/sh -c "miner versions" | egrep -o "[0-9]+.[0-9]+.[0-9]+" | xargs
-}
-
-get_miner_name()
-{
-  pod_id=$1
-  kubectl exec -it validator-$pod_id -c validator -- sh -c "miner info name" | egrep -o "[a-z]+-[a-z]+-[a-z]+" | xargs
-}
-
-get_miner_address()
-{
-  pod_id=$1
-
-  kubectl exec -it validator-$pod_id -c validator -- sh -c "miner peer addr" | grep -oE "[0-9a-zA-Z]{6,}"
-}
+source helper
 
 if [[ $CMD == "update" ]]; then
   miner_quay=$(curl -s "$QUAY_URL" --write-out '\nHTTP_Response:%{http_code}')
@@ -58,8 +41,16 @@ if [[ $CMD == "update" ]]; then
   fi
 
 elif [[ $CMD == "info" ]]; then
+  replica_id=$2
+  start_index=0
   validator_count=$(kubectl get pods | grep -c "validator")
-  for ((i = 0 ; i < $validator_count ; i++)); do
+
+  if [ ! -z $replica_id ]; then
+    start_index=$replica_id
+    validator_count=$((replica_id + 1))
+  fi
+
+  for ((i = $start_index ; i < $validator_count ; i++)); do
     pod="validator-$i"
     echo; echo "Pod: $pod"
 
@@ -98,7 +89,7 @@ elif [[ $CMD == "cg_perf" ]]; then
 
 elif [[ $CMD == "bash" ]]; then
   pod_id=$2
-  kubectl exec -it validator-$pod_id -c validator -- /bin/sh
+  kubectl exec -it validator-$pod_id -c validator -- /bin/ash
 
 elif [[ $CMD == "logs" ]]; then
   pod_id=$2

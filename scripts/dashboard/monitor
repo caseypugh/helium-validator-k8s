@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# upgrade DOKS 1-click monitoring stack (graf+prom+alertmanager)
+# `kubernetes-monitoring-stack`
+# https://marketplace.digitalocean.com/apps/kubernetes-monitoring-stack?iframe=true
+#
+# borrowed liberally from:
+# https://github.com/digitalocean/marketplace-kubernetes/blob/master/stacks/kube-prometheus-stack/deploy.sh
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd $SCRIPT_DIR
+source ../../.env
+
+GRAFANA_PORT=$GRAFANA_PORT
+# Set default port
+if [ -z $GRAFANA_PORT ]; then
+  GRAFANA_PORT=3000
+fi
+
+kubectl port-forward svc/kube-prometheus-stack-grafana $GRAFANA_PORT:80 -n kube-prometheus-stack &
+kubectl port-forward svc/kube-prometheus-stack-prometheus 9090 -n kube-prometheus-stack &
+kubectl port-forward svc/kube-prometheus-stack-alertmanager 9093 -n kube-prometheus-stack &
+
+echo "Visit =>"
+echo "Grafana: http://localhost:$GRAFANA_PORT -- user/pass=admin/prom-operator"
+echo "Prometheus query tool: http://localhost:9090"
+echo "Alertmanager: http://localhost:9093"
+echo
+wait
+echo "All done"
