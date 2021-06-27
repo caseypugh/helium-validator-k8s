@@ -12,12 +12,18 @@ Development is still early and pull requests are welcome!
     - [Dynamic ports](#dynamic-ports)
     - [Install validator config](#install-validator-config)
     - [Automatic updates](#automatic-updates)
+    - [Modify disk space](#modify-disk-space)
 - [Validator Management](#validator-management)
     - [Check status](#check-status)
     - [Add a new validator](#add-a-new-validator)
     - [Staking validators](#staking-validators)
     - [Managing swarm keys](#managing-swarm-keys)
     - [Replace a swarm key](#replace-a-swarm-key)
+- [Monitoring](#monitoring-optional)
+    - [k8s dasbhoard](#kubernetes-dashboard)
+    - [Grafana setup](#validator-monitoring-with-grafana)
+    - [Accessing Grafana](#accessing-grafana)
+    - [Validator dashboard](#setting-up-the-validator-dashboard)
 - [Troubleshooting](#troubleshooting)
 
 
@@ -96,6 +102,16 @@ You can manually trigger an update by visiting the [Validator Updater](https://g
 
 _(TODO, move this to a k8s CronJob)_
 
+## Modify disk space
+By default, every validator will have 20GB of space each. If the validators start to need more space, you will have to modify each of yoru PVCs:
+```sh
+# To get the name of your PVC(s)
+kubectl get pvc
+
+# <new-size> = i.e. '40Gi'
+kubectl patch pvc <your-pvc-name> -p '{ "spec": { "resources": { "requests": { "storage": "<new-size>" }}}}'
+```
+If you want automated alerts, check how to [set up Grafana](#monitoring-optional).
 
 # Validator Management
 
@@ -182,8 +198,8 @@ scripts/swarm-keys replace $replica_id animal-hotspot-name
 
 This will update the swarm_key and restart the specified pod replica.
 
-
-# Kubernetes Dashboard (Optional)
+# Monitoring (Optional)
+## Kubernetes dashboard
 
 DigitalOcean has the Kubernetes Dashboard setup for you already, but if you're running locally or on another host that doesn't have it, run:
 
@@ -191,7 +207,7 @@ DigitalOcean has the Kubernetes Dashboard setup for you already, but if you're r
 scripts/setup-k8s-dashboard
 ```
 
-# Monitoring (Optional)
+## Grafana setup
 
 If you're using DigitalOcean, you can [install Kubernetes Monitoring Stack](https://marketplace.digitalocean.com/apps/kubernetes-monitoring-stack) with a single click.
 
@@ -221,7 +237,7 @@ Prometheus query tool: http://localhost:9090
 Alertmanager: http://localhost:9093
 ```
 
-## Setting up the Helium Dashboard
+## Setting up the validator dashboard
 ![](assets/dashboard.png)
 
 Now that Grafana is setup and you have port forwarding running, let's get your Helium dashboard setup.
