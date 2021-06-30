@@ -1,4 +1,8 @@
 #!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+cd $SCRIPT_DIR
+
+source ../.env
 
 CMD=$1
 POD_NAME=validator
@@ -14,7 +18,7 @@ if [[ $CMD == "restart" ]]; then
     done
   else
     # Just restart the pod specified
-    kubectl delete pod $POD_NAME-$replica_id &
+    kubectl delete pod $POD_NAME-$replica_id --namespace $NAMESPACE &
   fi
 fi
 
