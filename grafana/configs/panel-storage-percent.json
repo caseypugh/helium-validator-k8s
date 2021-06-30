@@ -134,7 +134,7 @@
     "for": "1m",
     "alertRuleTags": {},
     "name": "",
-    "message": "Running low on space."
+    "message": ""
   },
   "cacheTimeout": null,
   "interval": null,
