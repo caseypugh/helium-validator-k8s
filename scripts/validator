@@ -38,7 +38,7 @@ if [[ $CMD == "update" ]]; then
     echo "Out of date!"
     echo "Latest version: $miner_latest_sha"
     echo "Container version: $container_version_sha ($container_version)"
-    deploy restart
+    ./deploy restart
   fi
 
 elif [[ $CMD == "info" ]]; then
