@@ -1,7 +1,5 @@
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-cd $SCRIPT_DIR
-
 source ../.env
 
 CMD=$1
@@ -17,13 +15,13 @@ if [[ $CMD == "restart" ]]; then
 
   if [ -z "$replica_id" ]; then
     # Delete all the validator pods. StatefulSet will automatically recreate them
-    validator_count=$(kubectl get pods | grep -c "$POD_NAME")
+    validator_count=$(kubectl get pods -n $NAMESPACE | grep -c "$POD_NAME")
     for ((i = 0 ; i < $validator_count ; i++)); do
-      kubectl delete pod $POD_NAME-$i &
+      kubectl delete pod -n $NAMESPACE $POD_NAME-$i &
     done
   else
     # Just restart the pod specified
-    kubectl delete pod $POD_NAME-$replica_id --namespace $NAMESPACE &
+    kubectl delete pod $POD_NAME-$replica_id -n $NAMESPACE &
   fi
 fi
 
