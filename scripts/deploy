@@ -7,6 +7,11 @@ source ../.env
 CMD=$1
 POD_NAME=validator
 
+if [ -z $NAMESPACE ]; then
+  echo "No namespace set. Defaulting to helium."
+  NAMESPACE="helium"
+fi
+
 if [[ $CMD == "restart" ]]; then
   replica_id=$2
 

@@ -7,6 +7,7 @@ QUAY_URL='https://quay.io/api/v1/repository/team-helium/validator/tag/?limit=20&
 ARCH=amd
 
 source helper
+source ../.env
 
 if [[ $CMD == "update" ]]; then
   miner_quay=$(curl -s "$QUAY_URL" --write-out '\nHTTP_Response:%{http_code}')
@@ -37,7 +38,7 @@ if [[ $CMD == "update" ]]; then
     echo "Out of date!"
     echo "Latest version: $miner_latest_sha"
     echo "Container version: $container_version_sha ($container_version)"
-    scripts/deploy restart
+    deploy restart
   fi
 
 elif [[ $CMD == "info" ]]; then
