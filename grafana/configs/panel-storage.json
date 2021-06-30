@@ -39,7 +39,7 @@
       "for": "1m",
       "frequency": "1m",
       "handler": 1,
-      "message": "Running low on space",
+      "message": "",
       "name": "attractive-vermilion-urchin #0 storage alert",
       "noDataState": "no_data",
       "notifications": [
