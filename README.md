@@ -50,7 +50,7 @@ doctl auth switch --context helium
 doctl kubernetes cluster kubeconfig save helium-cluster
 ```
 
-Before we setup the validators, let's create a `helium` context and switch to it.
+Before we setup the validators, let's create a `helium` namespace and set it as our default:
 ```sh
 kubectl create ns helium
 kubectl config set-context --current --namespace helium
