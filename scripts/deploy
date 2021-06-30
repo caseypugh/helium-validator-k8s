@@ -27,4 +27,4 @@ if [[ $CMD == "restart" ]]; then
   fi
 fi
 
-kubectl apply -f k8s/validator.yml
+kubectl apply -f ../k8s/validator.yml
