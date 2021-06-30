@@ -12,7 +12,9 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
-
+    env: 
+      NAMESPACE: ${{ secrets.NAMESPACE }}
+      
     steps:
       - uses: actions/checkout@v2
 
