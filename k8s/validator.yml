@@ -13,9 +13,20 @@ spec:
     metadata:
       labels:
         name: validator
-        dynamic-hostports: '2154' # Must be a string. Split multiple ports with '.'
+        app: validator # being used by ServiceMonitor; could we target 'name' instead?
+        dynamic-hostports: '2154' # must be a string. Split multiple ports with '.'
     spec:
       containers:
+        - name: validator-exporter
+          image: jamiedubs/validator-exporter:latest
+          # imagePullPolicy: Never # if using local image; build in `validator-exporter` repo
+          imagePullPolicy: Always
+          command: [ "/opt/app/miner_exporter.py" ]
+          ports:
+            - containerPort: 9825 # dial 9-VAL
+          volumeMounts:
+            - name: validator-vol # shared w/ validator
+              mountPath: /var/data
         - name: validator
           image: quay.io/team-helium/validator:latest-validator-amd64
           imagePullPolicy: Always
@@ -28,21 +39,38 @@ spec:
             - while [ -z $NAT_EXTERNAL_PORT ]; do
                 echo "searching for port...";
                 port=$(cat /etc/podinfo/annotations | grep "k8s/2154" | grep -oE "\"[0-9]+\"" | grep -oE "[0-9]+" | xargs);
-
                 if [ -n "$port" ]; then
                   export NAT_EXTERNAL_IP=$(wget -qO- ifconfig.me);
                   export NAT_EXTERNAL_PORT=$port;
                   echo "Exciting, I found a port! NAT_EXTERNAL_IP=$NAT_EXTERNAL_IP NAT_EXTERNAL_PORT=$NAT_EXTERNAL_PORT";
-
                   echo "export NAT_EXTERNAL_IP=$NAT_EXTERNAL_IP" >> ~/.profile;
                   echo "export NAT_EXTERNAL_PORT=$NAT_EXTERNAL_PORT" >> ~/.profile;
                   break;
                 fi;
                 sleep 2;
               done;
-              echo "all done";
-              /opt/miner/bin/miner foreground;
-
+              echo "starting miner...";
+              /opt/miner/bin/miner start;
+              echo "starting stats loop...";
+              v="/opt/miner/bin/miner";
+              dir="/var/data/stats";
+              mkdir $dir;
+              sleep 30;
+              while [ 1 ]; do
+                echo "$(date) - dumping stats to $dir ...";
+                $v info name > $dir/info_name;
+                $v info height > $dir/info_height;
+                $v info p2p_status > $dir/info_p2p_status;
+                $v info in_consensus > $dir/info_in_consensus;
+                $v info block_age > $dir/info_block_age;
+                $v hbbft perf --format csv > $dir/hbbft_perf.csv;
+                $v peer book -s --format csv > $dir/peer_book.csv;
+                $v ledger validators --format csv > $dir/ledger_validators.csv;
+                $v print_keys > $dir/print_keys;
+                $v versions > $dir/versions;
+                echo "$(date) - done with stats";
+                sleep 60;
+              done;
           env:
             - name: NAT_INTERNAL_PORT
               value: "2154"
@@ -58,7 +86,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
-
           ports:
             - containerPort: 2154
           volumeMounts:

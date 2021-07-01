@@ -1,20 +1,37 @@
-#!/bin/bash
+#!/bin/sh
+#
+# forked from DigitalOcean's official marketplace app:
+# wget "https://raw.githubusercontent.com/digitalocean/marketplace-kubernetes/master/stacks/kube-prometheus-stack/deploy.sh" -O install
+#
+# uses their values.yml configuration file as a default, but can be overloaded with values.yml file in this dir
+# e.g. to fix macOS "path / is mounted on / but it is not a shared or slave" bug:
+# https://github.com/prometheus-community/helm-charts/issues/467
+#
+
+set -e
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
+helm repo update > /dev/null
 
 STACK="kube-prometheus-stack"
 CHART="prometheus-community/kube-prometheus-stack"
-CHART_VERSION="12.7.0"
+CHART_VERSION="15.3.1"
 NAMESPACE="kube-prometheus-stack"
 
-# use github hosted master version of values.yml
-values="https://raw.githubusercontent.com/digitalocean/marketplace-kubernetes/master/stacks/kube-prometheus-stack/values.yml"
+cwd=$(dirname $0)
+local_values="$cwd/values.yml"
+if [ -e "$local_values" ]; then
+  echo "Using local values.yml file $local_values"
+  values=$local_values
+else
+  echo "Using default DigitalOcean values.yml file $default_values"
+  values="https://raw.githubusercontent.com/digitalocean/marketplace-kubernetes/master/stacks/kube-prometheus-stack/values.yml"
+fi
 
 helm upgrade "$STACK" "$CHART" \
-    --atomic \
-    --create-namespace \
-    --install \
-    --namespace "$NAMESPACE" \
-    --values "$values" \
-    --version "$CHART_VERSION"
+  --install \
+  --atomic \
+  --create-namespace \
+  --namespace "$NAMESPACE" \
+  --values "$values" \
+  --version "$CHART_VERSION"

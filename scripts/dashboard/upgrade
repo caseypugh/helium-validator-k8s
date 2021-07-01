@@ -1,8 +1,0 @@
-#!/bin/bash
-helm repo update
-
-helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack --namespace kube-prometheus-stack
-helm upgrade metrics-server bitnami/metrics-server --namespace kube-system
-
-# check on things
-kubectl --namespace kube-prometheus-stack get pods -l "release=kube-prometheus-stack"

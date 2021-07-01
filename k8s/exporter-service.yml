@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: validator-exporter
+  labels:
+    app: validator
+spec:
+  selector:
+    app: validator
+  ports:
+  - name: metrics
+    port: 9825
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: validator-exporter
+  labels:
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: validator
+  endpoints:
+  - port: metrics
