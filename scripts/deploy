@@ -27,3 +27,4 @@ if [[ $CMD == "restart" ]]; then
 fi
 
 kubectl apply -f ../k8s/validator.yml -n $NAMESPACE
+kubectl apply -f ../k8s/exporter-service.yml -n $NAMESPACE

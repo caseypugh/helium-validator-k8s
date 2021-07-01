@@ -70,6 +70,7 @@ Setup the validator StatefulSet by applying the yml config. We use StatefulSets 
 
 ```sh
 kubectl apply -f k8s/validator.yml
+kubectl apply -f k8s/exporter-service.yml
 
 # or alternately you can use our helper script
 scripts/deploy
@@ -96,7 +97,7 @@ kubectl logs validator-0 validator
 
 ## Automatic updates
 
-In order for [automatic validator updates](https://github.com/caseypugh/helium-validator/blob/main/.github/workflows/update-validator.yml) to work, you need to give set the `DIGITALOCEAN_ACCESS_TOKEN` in [GitHub Secrets](https://github.com/caseypugh/helium-validator/settings/secrets/actions) so the action can run. 
+In order for [automatic validator updates](https://github.com/caseypugh/helium-validator/blob/main/.github/workflows/update-validator.yml) to work, you need to give set the `DIGITALOCEAN_ACCESS_TOKEN` in [GitHub Secrets](https://github.com/caseypugh/helium-validator/settings/secrets/actions) so the action can run.
 
 You can manually trigger an update by visiting the [Validator Updater](https://github.com/caseypugh/helium-validator/actions/workflows/update-validator.yml) and then click `Run workflow`.
 
@@ -159,7 +160,7 @@ kubectl scale statefulsets validator --replicas=2
 In order to stake a specific validator in your cluster, run the following:
 
 ```sh
-scripts/validator stake $replica_id $wallet_path 
+scripts/validator stake $replica_id $wallet_path
 
 # For example...
 scripts/validator stake 0 ~/wallet.key
@@ -211,7 +212,7 @@ scripts/setup-k8s-dashboard
 
 If you're using DigitalOcean, you can [install Kubernetes Monitoring Stack](https://marketplace.digitalocean.com/apps/kubernetes-monitoring-stack) with a single click.
 
-Alternatively, you can use our helper scripts to get you setup with the full `kube-prometheus-stack` helm chart: 
+Alternatively, you can use our helper scripts to get you setup with the full `kube-prometheus-stack` helm chart:
 
 ```sh
 scripts/dashboard/install
@@ -246,7 +247,7 @@ Now that Grafana is setup and you have port forwarding running, let's get your H
 - If you'd like to receive push notifications to Discord, Slack, etc whenever there are alerts, create a new [notification channel](http://localhost:3000/alerting/notifications). Once created, set the `GRAFANA_NOTIFICATION_CHANNEL` env var to the id of your notification (you can find it in the URL).
 
 
-Finally, you can run the helper script to automatically create your dashboard. If you ever spin up more validators, you can just run this script to sync the dash again. 
+Finally, you can run the helper script to automatically create your dashboard. If you ever spin up more validators, you can just run this script to sync the dash again.
 ```
 scripts/dashboard/sync
 ```
