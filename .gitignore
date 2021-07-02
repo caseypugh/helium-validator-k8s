@@ -8,4 +8,5 @@ keys.yml
 *.key
 kubectl
 kubectl.sha256
+values.yml
 scripts/dashboard/values.yml
