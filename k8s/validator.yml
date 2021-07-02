@@ -4,7 +4,7 @@ kind: StatefulSet
 metadata:
   name: validator
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       name: validator
@@ -21,7 +21,7 @@ spec:
           image: jamiedubs/validator-exporter:latest
           # imagePullPolicy: Never # if using local image; build in `validator-exporter` repo
           imagePullPolicy: Always
-          command: [ "/opt/app/miner_exporter.py" ]
+          command: [ "/opt/app/validator-exporter.py" ]
           ports:
             - containerPort: 9825 # dial 9-VAL
           volumeMounts:
