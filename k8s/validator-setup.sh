@@ -35,9 +35,9 @@ while [ 1 ]; do
     $v print_keys > $dir/print_keys;
     $v versions > $dir/versions;
     echo "$(date) - Finished dump";
-    sleep 60;
+    sleep 120;
   else
     echo "Can't dump stats. Validator hasnt started yet $miner_name";
-    sleep 10;
+    sleep 30;
   fi;
 done;
