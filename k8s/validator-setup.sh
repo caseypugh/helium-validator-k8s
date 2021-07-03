@@ -25,16 +25,22 @@ while [ 1 ]; do
   miner_name=$($v info name);
   if [ ! -z "$miner_name" ] && [[ "$miner_name" != *"Error"* ]]; then
     echo "$(date) - Dumping stats to $dir ...";
+    start_time="$(date -u +%s)";
     echo "$miner_name" > $dir/info_name;
     $v info height > $dir/info_height;
     $v info p2p_status > $dir/info_p2p_status;
     $v info in_consensus > $dir/info_in_consensus;
     $v info block_age > $dir/info_block_age;
+
     $v hbbft perf --format csv > $dir/hbbft_perf.csv;
     $v peer book -s --format csv > $dir/peer_book.csv;
+    $v ledger validators --format csv > $dir/ledger_validators.csv;
     $v print_keys > $dir/print_keys;
     $v versions > $dir/versions;
-    echo "$(date) - Finished dump";
+    end_time="$(date -u +%s)";
+    elapsed="$(($end_time-$start_time))";
+    echo "Took $elapsed seconds";
+
     sleep 120;
   else
     echo "Can't dump stats. Validator hasnt started yet $miner_name";
