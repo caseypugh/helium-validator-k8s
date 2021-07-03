@@ -32,7 +32,6 @@ while [ 1 ]; do
     $v info block_age > $dir/info_block_age;
     $v hbbft perf --format csv > $dir/hbbft_perf.csv;
     $v peer book -s --format csv > $dir/peer_book.csv;
-    $v ledger validators --format csv > $dir/ledger_validators.csv;
     $v print_keys > $dir/print_keys;
     $v versions > $dir/versions;
     echo "$(date) - Finished dump";
