@@ -21,7 +21,6 @@ spec:
           image: jamiedubs/validator-exporter:latest
           # imagePullPolicy: Never # if using local image; build in `validator-exporter` repo
           imagePullPolicy: Always
-          command: [ "/opt/app/validator-exporter.py" ]
           ports:
             - containerPort: 9825 # dial 9-VAL
           volumeMounts:
