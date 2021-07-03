@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# Use "scripts/deploy restart" to both deploy new config and restart pods
+# Otherwise you'll want to delete and recreate the pods manually
+#
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 cd $SCRIPT_DIR
 source ../.env
@@ -42,22 +47,25 @@ while IFS= read -r line; do
   echo "${line//$target/$repl}"
 done < $validator_tpl > $validator_yml
 
+# TODO delete any stray comments
+# TODO make sure every line ends with a semicolon
+
+# Apply the new configurations
 kubectl apply -f $validator_yml -n $NAMESPACE
 kubectl apply -f ../k8s/exporter-service.yml -n $NAMESPACE
 
+# Cleanup temp files
 rm $validator_yml
 
+# After applying, you very likely want to delete some or all validator pods
+# so your new configuration can take effect. StatefulSet will recreate them
 if [[ $CMD == "restart" ]]; then
   replica_id=$2
-
   if [ -z "$replica_id" ]; then
-    # Delete all the validator pods. StatefulSet will automatically recreate them
-    validator_count=$(kubectl get pods -n $NAMESPACE | grep -c "$POD_NAME")
-    for ((i = 0 ; i < $validator_count ; i++)); do
-      kubectl delete pod -n $NAMESPACE $POD_NAME-$i &
-    done
+    echo "Restarting all pods in $NAMESPACE namespace..."
+    kubectl delete --all pods -n $NAMESPACE
   else
-    # Just restart the pod specified
-    kubectl delete pod $POD_NAME-$replica_id -n $NAMESPACE &
+    echo "Restarting $POD_NAME-$replica_id ..."
+    kubectl delete pod $POD_NAME-$replica_id -n $NAMESPACE
   fi
 fi
