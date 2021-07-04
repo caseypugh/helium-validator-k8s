@@ -46,4 +46,9 @@ while [ 1 ]; do
     echo "Can't dump stats. Validator hasnt started yet $miner_name";
     sleep 30;
   fi;
-done;
+done &
+
+echo "Sleeping 5s to let miner start...";
+sleep 5;
+echo "Tailing validator logs...";
+tail -F /var/data/log/*.log;
