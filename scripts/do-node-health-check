@@ -1,0 +1,36 @@
+#!/bin/bash
+RED='\033[0;31m'
+NC='\033[0m'
+
+# Fetch the current context and get all the nodes
+current_context=$(kubectl config current-context)
+cluster_id=$(doctl kubernetes cluster list -o json | jq -r --arg context "$current_context" '.[] | select(("do-" + .region + "-" + .name) == $context) | .id')
+
+echo "Current context $current_context ($cluster_id)"
+nodes_json=$(doctl kubernetes cluster node-pool list $cluster_id -o json)
+nodes=$(echo "$nodes_json" | jq -r '.[] | .nodes[] | .name')
+pool_id=$(echo "$nodes_json" | jq -r '.[] | .id')
+
+# Loop through the nodes
+for node in $nodes; do
+  node_id=$(echo "$nodes_json" | jq -r --arg name $node '.[] | .nodes[] | select(.name == $name) | .id')
+  echo; echo "Checking $node ($node_id)"
+
+  # Check if there is any "pleg" issues
+  error=$(kubectl describe node $node | grep pleg)
+
+  if [ ! -z "$error" ]; then
+    echo -e "${RED}There is an issue${NC}:"
+    echo "$error"
+
+    echo -n "Do you want to recycle $node (y/n)? "; read answer
+    if [ "$answer" != "${answer#[Yy]}" ] ;then
+      echo "Recycling..."
+      # https://docs.digitalocean.com/reference/doctl/reference/kubernetes/cluster/node-pool/replace-node/
+      doctl kubernetes cluster node-pool replace-node $cluster_id $pool_id $node_id --force
+      echo "Finished. Run the following command to check provisioning status:"
+
+      echo "doctl kubernetes cluster node-pool list $cluster_id -o json | jq '.[] | .nodes'"
+    fi
+  fi
+done
