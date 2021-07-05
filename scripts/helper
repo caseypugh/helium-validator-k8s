@@ -16,3 +16,8 @@ function get_miner_address {
   replica=$1
   kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -n $NAMESPACE -- sh -c "miner peer addr" | grep -oE "[0-9a-zA-Z]{6,}"
 }
+
+function is_in_consensus {
+  replica=$1
+  kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -n $NAMESPACE -- sh -c "miner info in_consensus"
+}
