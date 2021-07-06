@@ -26,6 +26,10 @@ spec:
           volumeMounts:
             - name: validator-vol # shared w/ validator
               mountPath: /var/data
+          livenessProbe:
+            tcpSocket:
+              port: 9825
+            initialDelaySeconds: 5
         - name: validator
           image: quay.io/team-helium/validator:latest-validator-amd64
           imagePullPolicy: Always
@@ -33,6 +37,25 @@ spec:
             requests:
               cpu: 1
               memory: "500Mi"
+          livenessProbe:
+            # exec:
+            #   command:
+            #   - /opt/miner/bin/miner
+            #   - ping
+            tcpSocket:
+              port: 2154
+            # initialDelaySeconds: 5 # using startupProbe instead; default=0
+            # timeoutSeconds: 1 # time after which probe times out; default=1
+            periodSeconds: 5 # check port every 5s; default=10
+            failureThreshold: 10 # kill the node after minute-ish of unresponsiveness; default=3
+          startupProbe:
+            exec:
+              command:
+              - cat
+              - /tmp/miner-started
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 12 # try for 1 minute before giving up
           command: [ "/bin/ash", "-c" ]
           args:
             - <VALIDATOR_SETUP_SCRIPT>

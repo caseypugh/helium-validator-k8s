@@ -14,17 +14,18 @@ done;
 
 echo "Starting miner...";
 /opt/miner/bin/miner daemon;
+touch /tmp/miner-started;
+sleep 60;
 
 echo "Starting stats loop...";
 v="/opt/miner/bin/miner";
 dir="/var/data/stats";
 mkdir -p $dir;
 
-sleep 5;
 while [ 1 ]; do
   miner_name=$($v info name);
   if [ ! -z "$miner_name" ] && [[ "$miner_name" != *"Error"* ]]; then
-    echo "$(date) - Dumping stats to $dir ...";
+    echo "Dumping stats to $dir ...";
     start_time="$(date -u +%s)";
     echo "$miner_name" > $dir/info_name;
     $v info height > $dir/info_height;
@@ -39,7 +40,7 @@ while [ 1 ]; do
     $v versions > $dir/versions;
     end_time="$(date -u +%s)";
     elapsed="$(($end_time-$start_time))";
-    echo "Took $elapsed seconds";
+    echo "Stats dump took $elapsed seconds";
 
     sleep 120;
   else
