@@ -76,6 +76,7 @@ spec:
                   fieldPath: status.hostIP
           ports:
             - containerPort: 2154
+            - containerPort: 4467
           volumeMounts:
             - name: validator-vol
               mountPath: /var/data
