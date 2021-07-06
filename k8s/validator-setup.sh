@@ -24,7 +24,7 @@ mkdir -p $dir;
 
 while [ 1 ]; do
   miner_name=$($v info name);
-  if [ ! -z "$miner_name" ] && [[ "$miner_name" != *"Error"* ]]; then
+  if [ ! -z "$miner_name" ] && [[ "$miner_name" != *"Error"* ]] && [[ "$miner_name" != *"not responding"* ]]; then
     echo "Dumping stats to $dir ...";
     start_time="$(date -u +%s)";
     echo "$miner_name" > $dir/info_name;
