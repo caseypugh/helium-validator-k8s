@@ -1,5 +1,7 @@
 # Helium Validators on Kubernetes (k8s)
 
+![](assets/logo.png)
+
 This is a DigitalOcean-specific [Kubernetes (k8s)](https://kubernetes.io/) setup for running a cluster of [Helium validators](https://www.helium.com/stake).
 
 Some modifications are necessary to run on other Kubernetes hosts.
@@ -29,6 +31,7 @@ All the core essentials you will need to get your environment setup:
 - Install **kubectl**: 
 `brew install kubectl` (or [Linux/Windows](https://kubernetes.io/docs/tasks/tools/))
 - Install **doctl**: `brew install doctl` (or [Linux/Windows](https://www.digitalocean.com/docs/apis-clis/doctl/how-to/install/))
+- Install **helm**: `brew install helm` (or [Linux/Windows](https://helm.sh/docs/intro/install/))
 - Install **jq**: `brew install jq` or `sudo apt install jq`
 
 # Cluster setup
