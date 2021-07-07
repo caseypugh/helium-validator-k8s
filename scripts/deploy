@@ -47,6 +47,18 @@ while IFS= read -r line; do
   echo "${line//$target/$repl}"
 done < $validator_tpl > $validator_yml
 
+# Get total validators needed for current context/environment
+current_context=$(kubectl config current-context)
+total_validators=1
+if [[ "$current_context" == "$MAINNET_CLUSTER" ]]; then
+  total_validators=$TOTAL_MAINNET_VALIDATORS
+elif [[ "$current_context" == "$TESTNET_CLUSTER" ]]; then
+  total_validators=$TOTAL_TESTNET_VALIDATORS
+fi
+
+# Replace TOTAL_VALIDATORS with current context
+sed -i "s/<TOTAL_VALIDATORS>/$total_validators/g" $validator_yml 
+
 # TODO delete any stray comments
 # TODO make sure every line ends with a semicolon
 

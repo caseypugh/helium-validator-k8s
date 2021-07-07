@@ -4,7 +4,7 @@ kind: StatefulSet
 metadata:
   name: validator
 spec:
-  replicas: 3
+  replicas: <TOTAL_VALIDATORS>
   selector:
     matchLabels:
       name: validator
