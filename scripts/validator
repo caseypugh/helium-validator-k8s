@@ -62,7 +62,7 @@ elif [[ $CMD == "info" ]]; then
     echo "Version: $(container_validator_version $i)"
     echo "Validator API: https://testnet-api.helium.wtf/v1/validators/$address"
 
-    in_consensus=$(is_in_consensus $i)
+    in_consensus="$(is_in_consensus $i)"
     if [[ $in_consensus =~ "true" ]]; then
       echo "Consensus group performance: "
       kubectl exec -it $pod -c validator -n $NAMESPACE -- sh -c "miner hbbft perf | grep $name"
