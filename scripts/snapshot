@@ -1,18 +1,49 @@
 #!/bin/bash
 
-replica_from="validator-$1"
-replica_to="validator-$2"
+NAMESPACE=helium
+CONTAINER=validator
+CMD=$1
+replica_from=
+replica_to=
+snapshot_path=./snapshot.bin
 
-echo "Exporting snapshot from $replica_from ..."
-kubectl exec -it $replica_from -c validator -n helium -- sh -c "miner snapshot take /var/data/snapshot.bin"
+if [[ "$CMD" == "download" || "$CMD" == "take" ]]; then
+  replica_from="validator-$2"
+elif [[ "$CMD" == "upload" || "$CMD" == "load" ]]; then
+  replica_to="validator-$2"
+elif [[ "$CMD" == "copy" || "$CMD" == "sync" ]]; then
+  replica_from="validator-$2"
+  replica_to="validator-$3"
+else
+  echo "snapshot: Unknown command (copy|download|upload)"
+  exit 1
+fi
 
-echo "Downloading snapshot ..."
-kubectl cp $replica_from:/var/data/snapshot.bin ./snapshot.bin -c validator -n helium
+if [ ! -z $replica_from ]; then
+  # if test $(find "$snapshot_path" -mmin +30); then
+  download=1
+  if [ -f $snapshot_path ]; then
+    echo -n "$snapshot_path already exists. Do you still want to download (y/n)? "; read answer
+    if [ "$answer" == "${answer#[Yy]}" ] ; then
+      download=
+    fi
+  fi
 
-echo "Uploading snapshot to $replica_to ..."
-kubectl cp ./snapshot.bin $replica_to:/var/data/snapshot.bin -c validator -n helium
+  if [ ! -z $download ]; then
+    echo; echo "Exporting snapshot from $replica_from ..."
+    kubectl exec -it $replica_from -c $CONTAINER -n $NAMESPACE -- sh -c "miner snapshot take /var/data/snapshot.bin"
 
-echo "Importing snapshot ..."
-kubectl exec -it $replica_to -c validator -n helium -- sh -c "miner snapshot load /var/data/snapshot.bin"
+    echo "Downloading snapshot ..."
+    kubectl cp $replica_from:/var/data/snapshot.bin $snapshot_path -c $CONTAINER -n $NAMESPACE > /dev/null
+  fi
+fi
+
+if [ ! -z $replica_to ]; then
+  echo; echo "Uploading snapshot to $replica_to ..."
+  kubectl cp $snapshot_path $replica_to:/var/data/snapshot.bin -c $CONTAINER -n $NAMESPACE
+
+  echo "Importing snapshot ..."
+  kubectl exec -it $replica_to -c $CONTAINER -n $NAMESPACE -- sh -c "miner snapshot load /var/data/snapshot.bin"
+fi
 
 echo "Finished!"
