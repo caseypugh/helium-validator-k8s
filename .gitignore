@@ -11,3 +11,4 @@ kubectl.sha256
 values.yml
 scripts/dashboard/values.yml
 assets/logo.psd
+snapshot.bin

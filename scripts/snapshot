@@ -1,0 +1,18 @@
+#!/bin/bash
+
+replica_from="validator-$1"
+replica_to="validator-$2"
+
+echo "Exporting snapshot from $replica_from ..."
+kubectl exec -it $replica_from -c validator -n helium -- sh -c "miner snapshot take /var/data/snapshot.bin"
+
+echo "Downloading snapshot ..."
+kubectl cp $replica_from:/var/data/snapshot.bin ./snapshot.bin -c validator -n helium
+
+echo "Uploading snapshot to $replica_to ..."
+kubectl cp ./snapshot.bin $replica_to:/var/data/snapshot.bin -c validator -n helium
+
+echo "Importing snapshot ..."
+kubectl exec -it $replica_to -c validator -n helium -- sh -c "miner snapshot load /var/data/snapshot.bin"
+
+echo "Finished!"
