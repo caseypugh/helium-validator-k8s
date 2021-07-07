@@ -6,6 +6,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 cd $SCRIPT_DIR
+source helper
 source ../.env
 
 CMD=$1
@@ -73,11 +74,25 @@ rm $validator_yml
 # so your new configuration can take effect. StatefulSet will recreate them
 if [[ $CMD == "restart" ]]; then
   replica_id=$2
-  if [ -z "$replica_id" ]; then
-    echo "Restarting all pods in $NAMESPACE namespace..."
-    kubectl delete --all pods -n $NAMESPACE
-  else
-    echo "Restarting $POD_NAME-$replica_id ..."
-    kubectl delete pod $POD_NAME-$replica_id -n $NAMESPACE
+  start_index=0
+  validator_count=$(kubectl get pods -n $NAMESPACE | grep -c "validator")
+
+  if [ ! -z $replica_id ]; then
+    start_index=$replica_id
+    validator_count=$((replica_id + 1))
   fi
+
+  for ((i = $start_index; i < $validator_count; i++)); do
+    pod="$POD_NAME-$i"
+
+    # We will skip pod deletion if validator is in consensus
+    echo "Checking if $pod is in consensus..."
+    in_consensus="$(is_in_consensus $i)"
+    if [[ $in_consensus =~ "true" ]]; then
+      echo "$pod is currently in consensus. Skipping deletion!"
+    else
+      echo "Restarting $pod ..."
+      kubectl delete pod $pod -n $NAMESPACE
+    fi
+  done
 fi

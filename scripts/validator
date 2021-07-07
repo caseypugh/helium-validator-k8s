@@ -62,16 +62,16 @@ elif [[ $CMD == "info" ]]; then
     echo "Version: $(container_validator_version $i)"
     echo "Validator API: https://testnet-api.helium.wtf/v1/validators/$address"
 
-    in_consensus=$(kubectl exec -it $pod -c validator -- sh -c "miner info in_consensus")
+    in_consensus=$(is_in_consensus $i)
     if [[ $in_consensus =~ "true" ]]; then
       echo "Consensus group performance: "
-      kubectl exec -it $pod -c validator -- sh -c "miner hbbft perf | grep $name"
+      kubectl exec -it $pod -c validator -n $NAMESPACE -- sh -c "miner hbbft perf | grep $name"
     else
       echo "Not currently in consensus group"
     fi
 
     # echo "Quay: $QUAY_URL"
-    kubectl exec -it $pod -c validator -- sh -c "miner info p2p_status"
+    kubectl exec -it $pod -c validator -n $NAMESPACE -- sh -c "miner info p2p_status"
   done
 
 elif [[ $CMD == "peers" ]]; then
