@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# Helper script to assist troubleshooting failing DigitalOcean droplets 
+# and will help you recycle the nodes
+#
+
 RED='\033[0;31m'
 NC='\033[0m'
 

@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# General kubeclt+validator helper script used 
+#
+
 POD_NAME=validator
 CONTAINER_NAME=validator
 RED='\033[0;31m'

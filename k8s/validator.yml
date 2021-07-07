@@ -39,10 +39,6 @@ spec:
               cpu: 1
               memory: "1.2Gi"
           livenessProbe:
-            # exec:
-            #   command:
-            #   - /opt/miner/bin/miner
-            #   - ping
             tcpSocket:
               port: 2154
             initialDelaySeconds: 5 # using startupProbe instead; default=0
