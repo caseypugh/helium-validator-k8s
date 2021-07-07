@@ -45,10 +45,10 @@ spec:
             #   - ping
             tcpSocket:
               port: 2154
-            initialDelaySeconds: 30 # using startupProbe instead; default=0
+            initialDelaySeconds: 5 # using startupProbe instead; default=0
             # timeoutSeconds: 1 # time after which probe times out; default=1
             periodSeconds: 5 # check port every 5s; default=10
-            failureThreshold: 10 # kill the node after minute-ish of unresponsiveness; default=3
+            failureThreshold: 12 # kill the node after 1min of unresponsiveness; default=3
           startupProbe:
             exec:
               command:

@@ -15,6 +15,7 @@ done;
 echo "Starting miner...";
 /opt/miner/bin/miner daemon;
 touch /tmp/miner-started;
+sleep 5;
 
 echo "Starting stats loop...";
 v="/opt/miner/bin/miner";
@@ -49,7 +50,5 @@ while [ 1 ]; do
   fi;
 done &
 
-echo "Sleeping 5s to let miner start...";
-sleep 5;
 echo "Tailing validator logs...";
 tail -F /var/data/log/*.log;
