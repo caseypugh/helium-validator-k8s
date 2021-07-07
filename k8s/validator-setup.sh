@@ -15,7 +15,6 @@ done;
 echo "Starting miner...";
 /opt/miner/bin/miner daemon;
 touch /tmp/miner-started;
-sleep 60;
 
 echo "Starting stats loop...";
 v="/opt/miner/bin/miner";
@@ -23,8 +22,9 @@ dir="/var/data/stats";
 mkdir -p $dir;
 
 while [ 1 ]; do
-  miner_name=$($v info name);
-  if [ ! -z "$miner_name" ] && [[ "$miner_name" != *"Error"* ]] && [[ "$miner_name" != *"not responding"* ]]; then
+  miner_name="$($v info name)";
+  match="$(echo "$miner_name" | grep -E '^[a-z]+\-[a-z]+\-[a-z]+')";
+  if [ ! -z "$match" ]; then
     echo "Dumping stats to $dir ...";
     start_time="$(date -u +%s)";
     echo "$miner_name" > $dir/info_name;
@@ -44,8 +44,8 @@ while [ 1 ]; do
 
     sleep 120;
   else
-    echo "Can't dump stats. Validator hasnt started yet $miner_name";
-    sleep 30;
+    echo "Can't dump stats. Validator hasnt started yet '$miner_name'";
+    sleep 5;
   fi;
 done &
 
