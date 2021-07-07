@@ -53,14 +53,15 @@ elif [[ $CMD == "info" ]]; then
 
   for ((i = $start_index; i < $validator_count; i++)); do
     pod="validator-$i"
-    echo; echo "Pod: $pod"
+    echo; echo -e "${GREEN}Pod:${NC} $pod"
 
     name=$(get_miner_name $i)
     address=$(get_miner_address $i)
-    echo "Name: $name"
-    echo "Address: $address"
-    echo "Version: $(container_validator_version $i)"
-    echo "Validator API: https://testnet-api.helium.wtf/v1/validators/$address"
+    echo -e "${GREEN}Name:${NC} $name"
+    echo -e "${GREEN}Address:${NC} $address"
+    echo -e "${GREEN}Version:${NC} $(container_validator_version $i)"
+    echo -e "${GREEN}Validator API:${NC} https://api.helium.io/v1/validators/$address"
+    echo -e "${GREEN}Explorer:${NC} https://explorer-beta.helium.com/validators/$address"
 
     in_consensus="$(is_in_consensus $i)"
     if [[ $in_consensus =~ "true" ]]; then
