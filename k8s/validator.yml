@@ -4,6 +4,9 @@ kind: StatefulSet
 metadata:
   name: validator
 spec:
+  podManagementPolicy: "Parallel" # Dont wait for other validators to terminate/bootup
+  updateStrategy: 
+    type: OnDelete # Validators wont automatically restart whenever you apply changes (use the ./scripts/restart script)
   replicas: <TOTAL_VALIDATORS>
   selector:
     matchLabels:
