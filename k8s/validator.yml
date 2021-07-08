@@ -53,17 +53,17 @@ spec:
           livenessProbe:
             tcpSocket:
               port: 2154
-            initialDelaySeconds: 5 # using startupProbe instead; default=0
-            # timeoutSeconds: 1 # time after which probe times out; default=1
-            periodSeconds: 10 # check port every 5s; default=10
-            failureThreshold: 20 # kill the node after 1min of unresponsiveness; default=3
+            initialDelaySeconds: 0 # using startupProbe instead; default=0
+            # timeoutSeconds: 1 # seconds after which probe times out; default=1
+            periodSeconds: 5 # check port every 5s; default=10
+            failureThreshold: 24 # kill the node after **2 mins** of unresponsiveness; default=3
           startupProbe:
             exec:
               command:
               - cat
               - /tmp/miner-started
-            initialDelaySeconds: 10
-            periodSeconds: 5
+            initialDelaySeconds: 0 # probe right away. default=0
+            periodSeconds: 5 # give validator **2 minutes** to start up before we kill and try again
             failureThreshold: 12 # try for 1 minute before giving up
           command: [ "/bin/ash", "-c" ]
           args:

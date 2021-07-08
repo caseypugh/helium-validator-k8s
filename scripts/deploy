@@ -63,6 +63,7 @@ if [ -z "$prom_exists" ]; then
   ./dashboard/install
 fi
 
+# Replace our <VALIDATOR_SETUP_SCRIPT> variable w/ contents of validator-setup.sh
 validator_tpl=../k8s/validator.yml
 validator_yml=../k8s/deploy.yml # tmp file
 setup_script=../k8s/validator-setup.sh
@@ -89,6 +90,9 @@ if [[ "$current_context" == "$MAINNET_CLUSTER" ]]; then
   total_validators=$TOTAL_MAINNET_VALIDATORS
 elif [[ "$current_context" == "$TESTNET_CLUSTER" ]]; then
   total_validators=$TOTAL_TESTNET_VALIDATORS
+else
+  echo "Warning, no TOTAL_*_VALIDATORS configured; defaulting to $total_validators"
+  echo "Check that your .env file has all the keys from .env.sample"
 fi
 
 # Replace TOTAL_VALIDATORS with value from our selected environment variable

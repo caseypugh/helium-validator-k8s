@@ -16,7 +16,6 @@ done;
 echo "Starting miner...";
 /opt/miner/bin/miner daemon;
 touch /tmp/miner-started;
-sleep 5;
 
 echo "Starting stats loop...";
 v="/opt/miner/bin/miner";
