@@ -5,7 +5,7 @@ metadata:
   name: validator
 spec:
   podManagementPolicy: "Parallel" # Dont wait for other validators to terminate/bootup
-  updateStrategy: 
+  updateStrategy:
     type: OnDelete # Validators wont automatically restart whenever you apply changes (use the ./scripts/restart script)
   replicas: <TOTAL_VALIDATORS>
   selector:
@@ -34,6 +34,15 @@ spec:
             tcpSocket:
               port: 9825
             initialDelaySeconds: 5
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
         - name: validator
           image: quay.io/team-helium/validator:latest-validator-amd64
           imagePullPolicy: Always
