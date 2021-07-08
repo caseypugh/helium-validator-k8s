@@ -1,3 +1,4 @@
+# Wait for port to be available via 
 while [ -z $NAT_EXTERNAL_PORT ]; do
   echo "Searching for port...";
   port=$(cat /etc/podinfo/annotations | grep "k8s/2154" | grep -oE "\"[0-9]+\"" | grep -oE "[0-9]+" | xargs);
@@ -22,11 +23,12 @@ v="/opt/miner/bin/miner";
 dir="/var/data/stats";
 mkdir -p $dir;
 
+# Dump stats every 120s
 while [ 1 ]; do
   miner_name="$($v info name)";
   match="$(echo "$miner_name" | grep -E '^[a-z]+\-[a-z]+\-[a-z]+')";
   if [ ! -z "$match" ]; then
-    echo "Dumping stats to $dir ...";
+    echo "[Stats] Dumping stats to $dir ...";
     start_time="$(date -u +%s)";
     echo "$miner_name" > $dir/info_name;
     $v info height > $dir/info_height;
@@ -41,14 +43,66 @@ while [ 1 ]; do
     $v versions > $dir/versions;
     end_time="$(date -u +%s)";
     elapsed="$(($end_time-$start_time))";
-    echo "Stats dump took $elapsed seconds";
+    echo "[Stats] Stats dump took $elapsed seconds";
 
     sleep 120;
   else
-    echo "Can't dump stats. Validator hasnt started yet '$miner_name'";
+    echo "[Stats] Can't dump stats. Validator hasnt started yet '$miner_name'";
     sleep 5;
+  fi;
+done &
+
+# Version check every 15 minutes
+while [ 1 ]; do
+  # Install jq to make our lives easier
+  if [ -z $(which jq) ]; then
+    echo "[Version] Installing jq dependency";
+    wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 --output-document="/usr/bin/jq";
+    chmod +x /usr/bin/jq;
+  fi;
+
+  in_consensus="$($v info in_consensus)";
+  if [[ $in_consensus == "true" ]]; then
+    echo "[Version] Validator currently in consensus. Skipping version check.";
+    sleep 900;
+    continue;
+  fi;
+
+  container_version="$(miner versions | grep -oE "\d+\.\d+\.\d+")";
+  if [ -z $container_version ]; then
+    echo "[Version] Couldn't fetch version";
+    sleep 30;
+    continue;
+  fi;
+
+  echo "[Version] Checking if validator needs to be updated ($container_version)";
+  QUAY_URL="https://quay.io/api/v1/repository/team-helium/validator/tag/?limit=10&page=1&onlyActiveTags=true";
+  ARCH=amd;
+  quay_response=$(wget -qO- "$QUAY_URL");
+
+  if [ -z $quay_response ]; then
+    echo "[Version] Bad response from quay.io $quay_response";
+    sleep 30;
+  else
+    latest_version_sha=$(echo "$quay_response" | jq -r -c --arg ARCH "$ARCH" '[ .tags[] | select( .name | contains($ARCH) and contains("latest-validator-")) ][0].manifest_digest');
+    current_version_sha=$(echo "$quay_response" | jq -r -c --arg ARCH "$ARCH" --arg VER "$container_version" '[ .tags[] | select( .name | contains($ARCH) and contains($VER)) ][0].manifest_digest');
+
+    if [[ "$current_version_sha" == "$latest_version_sha" ]]; then
+      echo "[Version] Already at latest version $current_version_sha ($container_version)";
+    else
+      echo "[Version] Out of date!";
+      echo "[Version] Latest $latest_version_sha";
+      echo "[Version] Current $current_version_sha ($container_version)";
+      echo "[Version] Shutting down validator";
+      
+      tail_process=$(pgrep -f "tail -F /var/data");
+      kill $tail_process;
+      exit 1;
+    fi;
+    sleep 900;
   fi;
 done &
 
 echo "Tailing validator logs...";
 tail -F /var/data/log/*.log;
+# Leave line break at end

@@ -64,12 +64,18 @@ if [ -z "$prom_exists" ]; then
 fi
 
 validator_tpl=../k8s/validator.yml
-validator_yml=../k8s/deploy.yml
+validator_yml=../k8s/deploy.yml # tmp file
+setup_script=../k8s/validator-setup.sh
+setup_script_tmp=../k8s/tmp.sh
+
 target="<VALIDATOR_SETUP_SCRIPT>"
-repl="$(cat ../k8s/validator-setup.sh)"
+
+# TODO make sure every line ends with a semicolon
+# Delete any comments and newlines
+grep -o '^[^#]*' $setup_script > $setup_script_tmp
 
 # Add tab spacing to the bash script to match yml
-repl=$(while IFS= read -r line; do echo -e "              $line"; done < ../k8s/validator-setup.sh)
+repl=$(while IFS= read -r line; do echo -e "              $line"; done < $setup_script_tmp)
 
 # Replace the target string in the yml
 while IFS= read -r line; do
@@ -86,7 +92,6 @@ elif [[ "$current_context" == "$TESTNET_CLUSTER" ]]; then
 fi
 
 # Replace TOTAL_VALIDATORS with value from our selected environment variable
-# Using an overly complicated awk one-liner due to "sed -i" not being cross-platform-friendly
 { rm $validator_yml && awk '{gsub("<TOTAL_VALIDATORS>", "'$total_validators'", $0); print}' > $validator_yml; } < $validator_yml
 
 # Apply the new configurations
@@ -94,7 +99,7 @@ kubectl apply -f $validator_yml -n $NAMESPACE
 kubectl apply -f ../k8s/exporter-service.yml -n $NAMESPACE
 
 # Cleanup temp files
-rm $validator_yml
+rm $validator_yml $setup_script_tmp
 
 if [[ $CMD == "restart" ]]; then
   ./restart pod

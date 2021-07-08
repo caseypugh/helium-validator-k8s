@@ -96,11 +96,7 @@ validator-1   2/2     Running   0          5m
 
 ## Automatic updates
 
-In order for [automatic validator updates](https://github.com/caseypugh/helium-validator/blob/main/.github/workflows/update-validator.yml) to work, you need to give set the `DIGITALOCEAN_ACCESS_TOKEN` in [GitHub Secrets](https://github.com/caseypugh/helium-validator/settings/secrets/actions) so the action can run.
-
-You can manually trigger an update by visiting the [Validator Updater](https://github.com/caseypugh/helium-validator/actions/workflows/update-validator.yml) and then click `Run workflow`.
-
-_(TODO, move this to a k8s CronJob)_
+Validators will automatically update themselves whenever a new version is released. If a validator is currently in consensus, it will not update until it is out of consensus.
 
 ## Modify disk space
 By default, every validator will have 20GB of space each. If the validators start to need more space, you will have to modify each of your PVCs:
@@ -124,7 +120,7 @@ Run this to see details on all your validators:
 scripts/validator info
 
 # Alternatively, you can specify the replica index to show a specific validator
-scripts/validator info 1
+scripts/validator info $replica_id
 ```
 
 And then you should see something like this:
