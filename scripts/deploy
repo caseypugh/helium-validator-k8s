@@ -23,7 +23,7 @@ fi
 
 # Warn operator if we're out-of-date with our git remote
 # Don't want to deploy an old version of the config on accident!
-git remote update
+git remote update >/dev/null
 UPSTREAM='@{u}'
 LOCAL=$(git rev-parse @)
 REMOTE=$(git rev-parse "$UPSTREAM" 2>/dev/null)
