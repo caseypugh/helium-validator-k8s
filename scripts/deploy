@@ -86,8 +86,8 @@ elif [[ "$current_context" == "$TESTNET_CLUSTER" ]]; then
 fi
 
 # Replace TOTAL_VALIDATORS with value from our selected environment variable
-sed -i '' "s/<TOTAL_VALIDATORS>/$total_validators/g" $validator_yml
-
+# Using an overly complicated awk one-liner due to "sed -i" not being cross-platform-friendly
+{ rm $validator_yml && awk '{gsub("<TOTAL_VALIDATORS>", "'$total_validators'", $0); print}' > $validator_yml; } < $validator_yml
 
 # Apply the new configurations
 kubectl apply -f $validator_yml -n $NAMESPACE
