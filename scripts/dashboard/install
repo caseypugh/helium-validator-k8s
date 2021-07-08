@@ -21,11 +21,11 @@ helm repo update > /dev/null
 ################################################################################
 STACK="kube-prometheus-stack"
 CHART="prometheus-community/kube-prometheus-stack"
-CHART_VERSION="15.3.1"
+CHART_VERSION="16.12.1"
 NAMESPACE="kube-prometheus-stack"
 
 cwd=$(dirname $0)
-local_values="$cwd/values.yml"
+local_values="$cwd/configs/values.yml"
 if [ -e "$local_values" ]; then
   echo "Using local values.yml file $local_values"
   values=$local_values
