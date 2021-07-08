@@ -3,6 +3,7 @@
 # Use "scripts/deploy restart" to both deploy new config and restart pods
 # Otherwise you'll want to delete and recreate the pods manually
 #
+set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 cd $SCRIPT_DIR
@@ -11,6 +12,9 @@ source ../.env
 
 CMD=$1
 POD_NAME=validator
+
+context=$(kubectl config current-context)
+echo "Deploying to $context..."
 
 if [ -z $NAMESPACE ]; then
   echo "No namespace set. Defaulting to helium."
@@ -58,7 +62,7 @@ elif [[ "$current_context" == "$TESTNET_CLUSTER" ]]; then
 fi
 
 # Replace TOTAL_VALIDATORS with current context
-sed -i "s/<TOTAL_VALIDATORS>/$total_validators/g" $validator_yml 
+sed -i '' "s/<TOTAL_VALIDATORS>/$total_validators/g" $validator_yml
 
 # TODO delete any stray comments
 # TODO make sure every line ends with a semicolon
