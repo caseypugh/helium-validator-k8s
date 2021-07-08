@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# General kubeclt+validator helper script used 
+# Misc kubectl+validator helper include 
 #
 
 POD_NAME=validator

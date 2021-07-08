@@ -1,0 +1,46 @@
+#!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+cd $SCRIPT_DIR
+source helper
+source ../.env
+
+CMD=$1 
+
+pattern="pod|validator|exporter"
+if [[ ! $CMD =~ $pattern ]]; then
+  echo "restart: Unknown command $CMD"
+  exit 1
+fi
+
+replica_id=$2
+start_index=0
+validator_count=$(kubectl get pods -n $NAMESPACE | grep -c "validator")
+
+if [ ! -z $replica_id ]; then
+  start_index=$replica_id
+  validator_count=$((replica_id + 1))
+fi
+
+for ((i = $start_index; i < $validator_count; i++)); do
+  pod="validator-$i"
+
+  if [[ $CMD == "pod" ]] || [[ $CMD == "validator" ]]; then 
+    # Skip pod deletion if validator is in consensus
+    echo "Checking if $pod is in consensus..."
+    in_consensus="$(is_in_consensus $i)"
+    if [[ $in_consensus =~ "true" ]]; then
+      echo "$pod is currently in consensus. Skipping deletion!"
+    else
+      if [[ $CMD == "pod" ]]; then
+        echo "Restarting $pod ..."
+        kubectl delete pod $pod -n $NAMESPACE
+      else 
+        echo "Restarting validator container in $pod ..."
+        kubectl exec -it $pod -c validator -n $NAMESPACE -- sh -c 'kill $(pgrep -f "tail -F /var/data")'
+      fi
+    fi
+  elif [[ $CMD == "exporter" ]]; then
+    echo "Restarting validator-exporter container in $pod ..."
+    kubectl exec -it $pod -c validator-exporter -n $NAMESPACE -- sh -c 'kill $(pgrep -f "exporter.py")'
+  fi
+done
