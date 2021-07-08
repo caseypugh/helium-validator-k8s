@@ -5,8 +5,8 @@
 #
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-cd $SCRIPT_DIR
+cd $(dirname $0)
+
 source helper
 source ../.env
 
@@ -14,7 +14,7 @@ CMD=$1
 POD_NAME=validator
 
 context=$(kubectl config current-context)
-echo "Deploying to $context..."
+echo; echo -e "${GREEN}Deploying to $context...${NC}"
 
 if [ -z $NAMESPACE ]; then
   echo "No namespace set. Defaulting to helium."
@@ -108,3 +108,5 @@ rm $validator_yml $setup_script_tmp
 if [[ $CMD == "restart" ]]; then
   ./restart pod
 fi
+
+echo

@@ -1,124 +1,79 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-cd $SCRIPT_DIR
+set -e
+cd $(dirname $0)
 
 source ../../.env
 source ../helper
 
-CONFIG_PATH=../../grafana/configs
+CONFIG_PATH=./configs
 panel_id=1
-
-function api {
-  path=$1
-  curl -s -H "Authorization: Bearer $GRAFANA_API_KEY" -H "Content-Type: application/json" http://localhost:${GRAFANA_PORT}${path}
-}
-
-function api_post {
-  path=$1
-  data=$2
-  curl -s -H "Authorization: Bearer $GRAFANA_API_KEY" -H "Content-Type: application/json" --data $data http://localhost:$GRAFANA_PORT$path
-}
 
 function load_panel {
   json=$1
   panel="$(cat $CONFIG_PATH/$json)"
-
-  if [[ $json != "dashboard.json" ]]; then
-    panel=$(echo "$panel" | jq ".id = $panel_id")
-  fi
-
-  panel=$(echo "$panel" | sed -e "s/{{namespace}}/$NAMESPACE/g")
-
   echo "$panel"
 }
 
 # Fetch the UID of our dashboard
-response=$(api /api/search?query=Helium+Validator)
-dash_uid=$(echo $response | jq -r -c '[ .[] | select( .title | contains("Helium Validator")) ][0].uid')
+dash_name="Helium Validator Dashboard"
+response=$(grafana_api /api/search?query=$dash_name)
+dash_uid=$(echo $response | jq -r -c --arg name "$dash_name" '[ .[] | select( .title | contains($name)) ][0].uid')
+
+echo
 
 if [[ $dash_uid == "null" ]] || [ -z $dash_uid ]; then
   echo "No Helium dashboard found. Creating a new one..."
   dash_uid=
 else 
-  response=$(api /api/dashboards/uid/$dash_uid)
+  response=$(grafana_api /api/dashboards/uid/$dash_uid)
   dash_version=$(echo $response | jq -r -c '[ .dashboard ][0].version')
-  echo "Updating existing Helium Dashboard (v$dash_version)"
-fi
-
-notification_uid=
-if [ ! -z $GRAFANA_NOTIFICATION_CHANNEL ]; then
-  notification_uid=$(api /api/alert-notifications | jq -r ".[] | select(.id == $GRAFANA_NOTIFICATION_CHANNEL) | .uid")
+  echo "Updating existing $dash_name (v$dash_version)"
 fi
 
 # Setup the dashboard
 dashboard=$(load_panel dashboard.json)
 
-if [ ! -z $dash_uid ]; then 
-  dashboard=$(echo $dashboard | jq ".dashboard.uid = \"$dash_uid\"")
-  dashboard=$(echo $dashboard | jq ".dashboard.version = $dash_version")
-fi 
+# Enclose contents in {"dashboard":{}} to prep for api
+dashboard=$(echo "$dashboard" | jq "{dashboard: . }")
 
-# CPU panel 
-cpu_panel=$(load_panel panel-cpu-usage.json)
-panel_id=$((panel_id + 1))
+# Automatically set the notification channel for all panels with alerts
+notification_uid=
+if [ ! -z $GRAFANA_NOTIFICATION_CHANNEL ]; then
+  notification_uid=$(grafana_api /api/alert-notifications | jq -r ".[] | select(.id == $GRAFANA_NOTIFICATION_CHANNEL) | .uid")
+  panels=$(echo "$dashboard" | jq ".dashboard.panels | map(if .alert.notifications != null then .alert.notifications = [{ uid: \"$notification_uid\" }] else . end)")
+  dashboard=$(echo "$dashboard" | jq ".dashboard.panels |= $panels")
+fi
 
-# Memory panel 
-memory_panel=$(load_panel panel-memory-usage.json)
-panel_id=$((panel_id + 1))
+# Delete the id
+dashboard=$(echo "$dashboard" | jq ".dashboard.id = null")
 
-# Receive Bandwidth panel 
-receive_bandwidth_panel=$(load_panel panel-receive-bandwidth.json)
-panel_id=$((panel_id + 1))
-
-# Transmit Bandwidth panel 
-transmit_bandwidth_panel=$(load_panel panel-transmit-bandwidth.json)
-panel_id=$((panel_id + 1))
-
-xpos=0
-validator_count=$(kubectl get pods | grep -c "validator")
-
-# Loop through all the validators
-for ((i = 0; i < $validator_count; i++)); do
-  pod="validator-$i"
-  miner_name="$(get_miner_name $i) #$i"
-  pvc="validator-vol-validator-$i"
-
-  # Storage panel setup
-  panel=$(load_panel panel-storage-percent.json)
-  panel_id=$((panel_id + 1))
-
-  # Position the panel
-  width=$(echo "$panel" | jq ".gridPos.w")
-  panel=$(echo "$panel" | jq ".gridPos.x = $xpos")
-  xpos=$((xpos + width))
-
-  panel=$(echo "$panel" | jq ".title = \"$miner_name storage\"")
-  panel=$(echo "$panel" | sed -e "s/{{pvc}}/$pvc/g")
-  panel=$(echo "$panel" | jq ".alert.name = \"$miner_name storage alert\"")
-
-  # Make sure Discord gets notified
-  if [ ! -z $notification_uid ]; then
-    panel=$(echo "$panel" | jq -c --arg uid "$notification_uid" '.alert.notifications = [{ uid: $uid }]')
-  fi
-
-  # Add storage panel to dash
-  dashboard=$(echo "$dashboard" | jq ".dashboard.panels += [$panel]")
-
-  # Rename validator-0 to hot-spot-name using transformations
-  t=$(cat $CONFIG_PATH/transformation-regex.json | jq ".options.regex = \"$pod\"" | jq ".options.renamePattern = \"$miner_name\"")
-
-  # Apply all the renaming transformations to each panel
-  cpu_panel=$(echo "$cpu_panel" | jq ".transformations += [$t]")
-  memory_panel=$(echo "$memory_panel" | jq ".transformations += [$t]")
-  receive_bandwidth_panel=$(echo "$receive_bandwidth_panel" | jq ".transformations += [$t]")
-  transmit_bandwidth_panel=$(echo "$transmit_bandwidth_panel" | jq ".transformations += [$t]")
-done
-
-# Add all the panels to the dash
-dashboard=$(echo "$dashboard" | jq ".dashboard.panels += [$cpu_panel, $memory_panel, $receive_bandwidth_panel, $transmit_bandwidth_panel]")
+if [ -z $dash_uid ]; then 
+  # Delete these when creating a new dash
+  dashboard=$(echo "$dashboard" | jq ".dashboard.uid = null")
+  dashboard=$(echo "$dashboard" | jq ".dashboard.version = null")
+else
+  # Update existing dash
+  dashboard=$(echo "$dashboard" | jq ".dashboard.uid = \"$dash_uid\"")
+  dashboard=$(echo "$dashboard" | jq ".dashboard.version = $dash_version")
+fi
 
 # Save!
 echo "$dashboard" >payload.json
-api_post /api/dashboards/db @payload.json
+grafana_api_post /api/dashboards/db @payload.json | jq
 rm payload.json
+
+# Add Helium Oracle price datasource
+search="https://api.helium.io/v1/"
+helium_datasource=$(grafana_api /api/datasources | jq -r --arg url "$search" '[.[] | select(.url | contains($url))][0].uid')
+if [[ "$helium_datasource" == "null" ]]; then
+  echo "Adding Helium API as a datasource"
+  grafana_api_post /api/datasources @configs/helium-datasource.json | jq
+fi
+
+echo
+echo "Updated! Visit your dashboard:"
+echo "http://localhost:3000/d/$dash_uid" 
+echo
+
+

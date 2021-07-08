@@ -221,16 +221,13 @@ Visit [http://localhost:3000](http://localhost:3000) to see your Grafana dashboa
 ## Setting up the validator dashboard
 ![](assets/dashboard.png)
 
-Now that Grafana is setup and you have port forwarding running, let's get your Helium dashboard setup.
-- Create a [Grafana API key](http://localhost:3000/org/apikeys) with the `Editor` role
-- Save the key into your `GRAFANA_API_KEY` env var. If you dont have an `.env` file, just run `cp .env.sample .env` to get it started.
-- If you'd like to receive push notifications to Discord, Slack, etc whenever there are alerts, create a new [notification channel](http://localhost:3000/alerting/notifications). Once created, set the `GRAFANA_NOTIFICATION_CHANNEL` env var to the id of your notification (you can find it in the URL).
-
-
-Finally, you can run the helper script to automatically create your dashboard. If you ever spin up more validators, you can just run this script to sync the dash again.
+Now that Grafana is setup and you have port forwarding running, let's get your Helium dashboard setup. 
 ```
 scripts/dashboard/sync
 ```
+
+If you'd like to receive push notifications to Discord, Slack, etc whenever there are alerts, create a new [notification channel](http://localhost:3000/alerting/notifications). Once created, set the `GRAFANA_NOTIFICATION_CHANNEL` env var to the `id` of your notification (you can find it in the URL). Then just rerun `scripts/dashboard/sync` and it will automatically update all the panel alerts to the notificationchannel.
+
 
 # Troubleshooting
 Coming soon...

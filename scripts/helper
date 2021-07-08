@@ -28,3 +28,14 @@ function is_in_consensus {
   replica=$1
   kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -n $NAMESPACE -- /bin/sh -c "miner info in_consensus"
 }
+
+function grafana_api {
+  path=$1
+  curl -s --user admin:prom-operator -H "Content-Type: application/json" http://localhost:${GRAFANA_PORT}${path}
+}
+
+function grafana_api_post {
+  path=$1
+  data=$2
+  curl -s --user admin:prom-operator -H "Content-Type: application/json" --data $data "http://localhost:$GRAFANA_PORT$path"
+}

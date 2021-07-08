@@ -4,8 +4,7 @@
 # update|info|peers|cg_perf|bash|logs|stake|reset_db|kickstart
 #
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-cd $SCRIPT_DIR
+cd $(dirname $0)
 
 CMD=$1
 

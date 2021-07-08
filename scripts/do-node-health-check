@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+# DEPRECATED
 # Helper script to assist troubleshooting failing DigitalOcean droplets 
 # and will help you recycle the nodes
 #

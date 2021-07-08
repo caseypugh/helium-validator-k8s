@@ -7,8 +7,7 @@
 # borrowed liberally from:
 # https://github.com/digitalocean/marketplace-kubernetes/blob/master/stacks/kube-prometheus-stack/deploy.sh
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-cd $SCRIPT_DIR
+cd $(dirname $0)
 source ../../.env
 
 GRAFANA_PORT=$GRAFANA_PORT

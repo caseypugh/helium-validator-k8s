@@ -1,5 +1,6 @@
 #!/bin/bash
-source .env
+cd $(dirname $0)
+source ../.env
 
 CMD=$1
 KEY_NAME=swarm-keys
