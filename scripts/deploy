@@ -21,7 +21,31 @@ if [ -z $NAMESPACE ]; then
   NAMESPACE="helium"
 fi
 
-# Automatically create the namespace if it doesnt exist
+# Warn operator if we're out-of-date with our git remote
+# Don't want to deploy an old version of the config on accident!
+git remote update
+UPSTREAM='@{u}'
+LOCAL=$(git rev-parse @)
+REMOTE=$(git rev-parse "$UPSTREAM" 2>/dev/null)
+
+if [ "$LOCAL" != "$REMOTE" ]; then
+  echo "Warning, your local git checkout is not up-to-date"
+  echo "Latest local commit: $LOCAL"
+  echo "Latest remote commit: $REMOTE"
+  [ -z "$REMOTE" ] && echo "(blank means you're in a local branch with no remote tracking branch)"
+
+  echo
+  read -r -p "Do you want to deploy anyway? [y/N] " response
+  # response=${response,,} # tolower
+  if [[ "$response" =~ ^(yes|y)$ ]]; then
+    echo "Proceeding! YOLO"
+  else
+    echo "Aborting. Do a 'git pull' and try again."
+    exit 1
+  fi
+fi
+
+# Automatically create the namespace if it doesn't exist
 namespace_exists=$(kubectl get namespaces | grep $NAMESPACE)
 if [ -z "$namespace_exists" ]; then
   kubectl create ns $NAMESPACE
@@ -61,11 +85,9 @@ elif [[ "$current_context" == "$TESTNET_CLUSTER" ]]; then
   total_validators=$TOTAL_TESTNET_VALIDATORS
 fi
 
-# Replace TOTAL_VALIDATORS with current context
+# Replace TOTAL_VALIDATORS with value from our selected environment variable
 sed -i '' "s/<TOTAL_VALIDATORS>/$total_validators/g" $validator_yml
 
-# TODO delete any stray comments
-# TODO make sure every line ends with a semicolon
 
 # Apply the new configurations
 kubectl apply -f $validator_yml -n $NAMESPACE
