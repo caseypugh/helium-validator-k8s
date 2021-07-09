@@ -2,9 +2,7 @@
 
 ![](assets/logo.png)
 
-This is a DigitalOcean-specific [Kubernetes (k8s)](https://kubernetes.io/) setup for running a cluster of [Helium validators](https://www.helium.com/stake).
-
-Some modifications are necessary to run on other Kubernetes hosts.
+This is a DigitalOcean-specific [Kubernetes (k8s)](https://kubernetes.io/) setup for running a cluster of [Helium validators](https://www.helium.com/stake). Some modifications are necessary to run on other Kubernetes hosts.
 
 Development is still early and pull requests are welcome!
 
@@ -20,10 +18,10 @@ Development is still early and pull requests are welcome!
     - [Staking validators](#staking-validators)
     - [Managing swarm keys](#managing-swarm-keys)
     - [Replace a swarm key](#replace-a-swarm-key)
-- [Monitoring](#monitoring-optional)
-    - [k8s dasbhoard](#kubernetes-dashboard)
+- [Monitoring](#monitoring)
     - [Accessing Grafana](#accessing-grafana)
     - [Validator dashboard](#setting-up-the-validator-dashboard)
+    - [k8s dasbhoard](#kubernetes-dashboard-optional)
 - [Troubleshooting](#troubleshooting)
 
 # Local environment setup
@@ -194,13 +192,7 @@ scripts/swarm-keys replace $replica_id $animal_hotspot_name
 This will update the swarm_key and restart the specified pod replica.
 
 # Monitoring 
-## Kubernetes dashboard (optional)
 
-DigitalOcean has the Kubernetes Dashboard setup for you already, but if you're running locally or on another host that doesn't have it, run:
-
-```sh
-scripts/setup-k8s-dashboard
-```
 
 ## Accessing Grafana
 Grafana and prometheus should already be running thanks to the deploy script. Now you can setup a proxy to your Grafana dashboard using:
@@ -221,13 +213,29 @@ Visit [http://localhost:3000](http://localhost:3000) to see your Grafana dashboa
 ## Setting up the validator dashboard
 ![](assets/dashboard.png)
 
-Now that Grafana is setup and you have port forwarding running, let's get your Helium dashboard setup. 
+Now that Grafana is setup and you have port forwarding running, let's get your Helium validator dashboard setup. Run this command:
 ```
 scripts/dashboard/sync
 ```
 
-If you'd like to receive push notifications to Discord, Slack, etc whenever there are alerts, create a new [notification channel](http://localhost:3000/alerting/notifications). Once created, set the `GRAFANA_NOTIFICATION_CHANNEL` env var to the `id` of your notification (you can find it in the URL). Then just rerun `scripts/dashboard/sync` and it will automatically update all the panel alerts to the notificationchannel.
+## Receiving Alerts
+There are already a bunch of alerts setup in this dashboard, but if you'd like to receive push notifications (Discord, Slack, etc) whenever there are alerts, create a new [notification channel](http://localhost:3000/alerting/notifications). 
 
+Once created, set the `GRAFANA_NOTIFICATION_CHANNEL` env var to the `id` of your notification (you can find it in the URL). Then just rerun `scripts/dashboard/sync` and it will automatically update all the panel alerts to the notification channel.
+
+## Kubernetes dashboard (optional)
+
+DigitalOcean has the Kubernetes Dashboard setup for you already, but if you're running locally or on another host that doesn't have it, you can run:
+
+```sh
+scripts/setup-k8s-dashboard
+```
+
+_Note: I don't really use this dashboard much and primarily just use [k9s](https://github.com/derailed/k9s)_
 
 # Troubleshooting
-Coming soon...
+Some very helpful tools to make your Kubernetes life easier
+- [k9s](https://github.com/derailed/k9s) - K9s provides a terminal UI to interact with your Kubernetes clusters.
+- [BotKube](https://www.botkube.io/) - BotKube is a messaging bot for monitoring and debugging Kubernetes clusters.
+
+More coming soon...

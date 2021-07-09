@@ -75,5 +75,3 @@ echo
 echo "Updated! Visit your dashboard:"
 echo "http://localhost:3000/d/$dash_uid" 
 echo
-
-
