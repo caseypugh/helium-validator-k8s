@@ -7,21 +7,24 @@ This is a DigitalOcean-specific [Kubernetes (k8s)](https://kubernetes.io/) setup
 Development is still early and pull requests are welcome!
 
 ### Table of contents
+- [Helium Validators on Kubernetes (k8s)](#helium-validators-on-kubernetes-k8s)
+    - [Table of contents](#table-of-contents)
 - [Local environment setup](#local-environment-setup)
 - [Cluster setup](#cluster-setup)
-    - [Deploy the validators](#deploy-the-validators)
-    - [Automatic updates](#automatic-updates)
-    - [Modify disk space](#modify-disk-space)
+  - [Deploy the validators](#deploy-the-validators)
+  - [Automatic updates](#automatic-updates)
+  - [Modify disk space](#modify-disk-space)
 - [Validator Management](#validator-management)
-    - [Check status](#check-status)
-    - [Add a new validator](#add-a-new-validator)
-    - [Staking validators](#staking-validators)
-    - [Managing swarm keys](#managing-swarm-keys)
-    - [Replace a swarm key](#replace-a-swarm-key)
+  - [Check status](#check-status)
+  - [Add a new validator](#add-a-new-validator)
+  - [Staking validators](#staking-validators)
+  - [Managing swarm keys](#managing-swarm-keys)
+  - [Replace a swarm key](#replace-a-swarm-key)
 - [Monitoring](#monitoring)
-    - [Accessing Grafana](#accessing-grafana)
-    - [Validator dashboard](#setting-up-the-validator-dashboard)
-    - [k8s dasbhoard](#kubernetes-dashboard-optional)
+  - [Accessing Grafana](#accessing-grafana)
+  - [Setting up the validator dashboard](#setting-up-the-validator-dashboard)
+  - [Receiving Alerts](#receiving-alerts)
+  - [Kubernetes dashboard (optional)](#kubernetes-dashboard-optional)
 - [Troubleshooting](#troubleshooting)
 
 # Local environment setup
@@ -147,17 +150,7 @@ Not currently in consensus group
 
 
 ## Staking validators
-In order to stake a specific validator in your cluster, run the following:
-
-```sh
-# replica_id is the index number associated with the pod (e.g. 0, 1, 2). 
-scripts/validator stake $replica_id $wallet_path
-
-# For example...
-scripts/validator stake 0 ~/wallet.key
-```
-
-This assumes 10,000 HNT will be staked. There is an optional 4th argument where you can stake a different amount (but not sure why you'd ever need to do that).
+Please refer to [Helium's guide](https://docs.helium.com/mine-hnt/validators/testnet/wallet/) on staking a validator. To get a validator's address, use the `scripts/validator info` command as described above.
 
 ## Managing swarm keys
 
