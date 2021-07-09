@@ -1,4 +1,4 @@
-# Helium Validators on Kubernetes (k8s)
+<h1>Helium Validators on Kubernetes (k8s)</h1>
 
 ![](assets/logo.png)
 
@@ -6,9 +6,6 @@ This is a DigitalOcean-specific [Kubernetes (k8s)](https://kubernetes.io/) setup
 
 Development is still early and pull requests are welcome!
 
-### Table of contents
-- [Helium Validators on Kubernetes (k8s)](#helium-validators-on-kubernetes-k8s)
-    - [Table of contents](#table-of-contents)
 - [Local environment setup](#local-environment-setup)
 - [Cluster setup](#cluster-setup)
   - [Deploy the validators](#deploy-the-validators)
