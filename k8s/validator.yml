@@ -23,8 +23,8 @@ spec:
       containers:
         - name: validator-exporter
           image: jamiedubs/validator-exporter:latest
-          # imagePullPolicy: Never # if using local image; build in `validator-exporter` repo
-          imagePullPolicy: Always
+          imagePullPolicy: Never # if using local image; build in `validator-exporter` repo
+          # imagePullPolicy: Always
           ports:
             - containerPort: 9825 # dial 9-VAL
           volumeMounts:
@@ -109,4 +109,4 @@ spec:
         resources:
           requests:
             storage: 20Gi
-        storageClassName: do-block-storage
+        # storageClassName: do-block-storage
