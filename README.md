@@ -145,7 +145,7 @@ Not currently in consensus group
 ## Add a new validator
 
 - Edit `TOTAL_MAINNET_VALIDATORS` in your `.env` 
-- Run `scripts/deploy` to new validator will automatically deploy.
+- Run `scripts/deploy` to and the new validator(s) will automatically deploy.
 - Run `kubectl get pods -w` to monitor the new pod and verify it launched.
 
 
