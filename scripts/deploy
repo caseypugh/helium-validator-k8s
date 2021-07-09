@@ -3,7 +3,6 @@
 # Use "scripts/deploy restart" to both deploy new config and restart pods
 # Otherwise you'll want to delete and recreate the pods manually
 #
-set -e
 
 cd $(dirname $0)
 
