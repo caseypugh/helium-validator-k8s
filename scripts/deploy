@@ -3,7 +3,6 @@
 # Use "scripts/deploy restart" to both deploy new config and restart pods
 # Otherwise you'll want to delete and recreate the pods manually
 #
-set -e
 
 cd $(dirname $0)
 
@@ -44,6 +43,9 @@ if [ "$LOCAL" != "$REMOTE" ]; then
     exit 1
   fi
 fi
+
+# Abort on errors from here on out
+set -e
 
 # Automatically create the namespace if it doesn't exist
 namespace_exists=$(kubectl get namespaces | grep $NAMESPACE)
