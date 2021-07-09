@@ -1,4 +1,5 @@
 # prometheus-community/kube-prometheus-stack
+# Reference: https://github.com/grafana/helm-charts/tree/main/charts/grafana
 
 grafana:
   persistence:
@@ -10,3 +11,7 @@ grafana:
   plugins:
     - marcusolsson-json-datasource
     # - grafana-image-renderer
+  dashboards:
+    default:
+      helium-dashboard:
+        url: https://raw.githubusercontent.com/caseypugh/helium-validator-k8s/main/scripts/dashboard/configs/dashboard.json

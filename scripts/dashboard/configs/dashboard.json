@@ -3481,5 +3481,6 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Helium Validator Dashboard"
+  "title": "Helium Validator Dashboard",
+  "version": 1
 }

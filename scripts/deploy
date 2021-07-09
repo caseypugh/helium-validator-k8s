@@ -98,6 +98,7 @@ else
 fi
 
 # Replace TOTAL_VALIDATORS with value from our selected environment variable
+# Awkward replace command to make WSL & Mac compatible
 { rm $validator_yml && awk '{gsub("<TOTAL_VALIDATORS>", "'$total_validators'", $0); print}' > $validator_yml; } < $validator_yml
 
 # Apply the new configurations
