@@ -3,7 +3,6 @@ cd $(dirname $0)
 source ../.env
 
 CMD=$1
-KEY_NAME=swarm-keys
 
 # Sign into 1password if enabled
 op_logged_in=
@@ -27,26 +26,31 @@ if [[ $CMD == "sync" ]]; then
   echo; echo "Downloading swarm_keys from cluster..."
 
   # Loop through all the validators
-  validator_count=$(kubectl get pods | grep -c "validator")
+  validator_count=$(kubectl get pods -n $NAMESPACE | grep -c "validator")
   for ((i = 0 ; i < $validator_count ; i++)); do
     pod="validator-$i"
     echo; echo "Pod: $pod"
 
-    miner_name=$(kubectl exec -it $pod -c validator -- sh -c "miner info name" | egrep -o "[a-z]+-[a-z]+-[a-z]+" | xargs)
+    miner_name=$(kubectl exec -it $pod -c validator -n $NAMESPACE -- sh -c "miner info name" | egrep -o "[a-z]+-[a-z]+-[a-z]+" | xargs)
     echo "Miner Name: $miner_name"
 
     mkdir -p keys
     mkdir -p keys/$miner_name
 
     # Download the swarm_key
-    swarm_key_path=keys/$miner_name/swarm_key
+    swarm_key_path=../keys/$miner_name/swarm_key
 
-    kubectl cp $pod:/var/data/miner/swarm_key $swarm_key_path -c validator > /dev/null
+    kubectl cp $pod:/var/data/miner/swarm_key $swarm_key_path -c validator -n $NAMESPACE > /dev/null
     echo "Downloaded swarm_key to $swarm_key_path"
 
     # Save to 1password
-    if [ ! -z $op_logged_in ]; then 
-      swarm_key_base64=$(base64 -w 0 $swarm_key_path)
+    if [ ! -z "$op_logged_in" ]; then
+      swarm_key_base64=
+      if [ "$(uname)" == "Darwin" ]; then
+        swarm_key_base64=$(base64 -e $swarm_key_path)
+      else # Assuming WSL here..
+        swarm_key_base64=$(base64 -w 0 $swarm_key_path)
+      fi
       validator_login_title="$miner_name swarm_key"
 
       uuid=$(op list items | jq -r --arg title "$validator_login_title" '[.[] | select(.overview.title | contains($title))][0] | .uuid')
@@ -77,7 +81,7 @@ elif [[ $CMD == "replace" ]]; then
   if [ ! -f $swarm_key_file_path ]; then
     miner_name=$swarm_key_file_path
 
-    if [ ! -z $op_logged_in ]; then 
+    if [ ! -z "$op_logged_in" ]; then
       echo "Fetching swarm_key for $miner_name from 1Password"
       swarm_key_uuid=$(op list items | jq -r --arg title "$miner_name swarm_key" '[.[] | select(.overview.title | contains($title))][0] | .uuid')
 
@@ -100,10 +104,10 @@ elif [[ $CMD == "replace" ]]; then
     pod=validator-$replica_id
 
     echo; echo "Uploading swarm_key to $pod."
-    kubectl cp $swarm_key_file_path $pod:/var/data/miner/swarm_key -c validator
+    kubectl cp $swarm_key_file_path $pod:/var/data/miner/swarm_key -c validator -n $NAMESPACE
 
     echo "Restarting $pod..."
-    scripts/deploy restart $replica_id
+    ./deploy restart $replica_id
 
     rm tmp_swarm_key 2> /dev/null
   fi
