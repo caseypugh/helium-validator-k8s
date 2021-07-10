@@ -19,8 +19,6 @@ Development is still early and pull requests are welcome!
   - [Replace a swarm key](#replace-a-swarm-key)
 - [Monitoring](#monitoring)
   - [Accessing Grafana](#accessing-grafana)
-  - [Setting up the validator dashboard](#setting-up-the-validator-dashboard)
-  - [Receiving Alerts](#receiving-alerts)
   - [Kubernetes dashboard (optional)](#kubernetes-dashboard-optional)
 - [Troubleshooting](#troubleshooting)
 
@@ -182,7 +180,7 @@ scripts/swarm-keys replace $replica_id $animal_hotspot_name
 This will update the swarm_key and restart the specified pod replica.
 
 # Monitoring 
-
+![](assets/dashboard.png)
 
 ## Accessing Grafana
 Grafana and prometheus should already be running thanks to the deploy script. Now you can setup a proxy to your Grafana dashboard using:
@@ -199,19 +197,6 @@ Alertmanager: http://localhost:9093
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to see your Grafana dashboard.
-
-## Setting up the validator dashboard
-![](assets/dashboard.png)
-
-Now that Grafana is setup and you have port forwarding running, let's get your Helium validator dashboard setup. Run this command:
-```
-scripts/dashboard/sync
-```
-
-## Receiving Alerts
-There are already a bunch of alerts setup in this dashboard, but if you'd like to receive push notifications (Discord, Slack, etc) whenever there are alerts, create a new [notification channel](http://localhost:3000/alerting/notifications). 
-
-Once created, set the `GRAFANA_NOTIFICATION_CHANNEL` env var to the `id` of your notification (you can find it in the URL). Then just rerun `scripts/dashboard/sync` and it will automatically update all the panel alerts to the notification channel.
 
 ## Kubernetes dashboard (optional)
 
