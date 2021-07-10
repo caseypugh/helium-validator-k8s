@@ -62,7 +62,7 @@ fi
 # Install kube-prometheus-stack
 prom_exists=$(kubectl get pods --all-namespaces | grep kube-prometheus-stack)
 if [ -z "$prom_exists" ]; then
-  ./dashboard/install
+  ./dashboard/setup
 fi
 
 # Replace our <VALIDATOR_SETUP_SCRIPT> variable w/ contents of validator-setup.sh
