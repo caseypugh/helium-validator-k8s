@@ -183,7 +183,7 @@ scripts/swarm-keys replace $replica_id $animal_hotspot_name
 This will update the swarm_key and restart the specified pod replica.
 
 # Monitoring 
-
+![](assets/dashboard.png)
 
 ## Accessing Grafana
 Grafana and prometheus should already be running thanks to the deploy script. Now you can setup a proxy to your Grafana dashboard using:
