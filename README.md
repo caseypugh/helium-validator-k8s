@@ -29,6 +29,7 @@ All the core essentials you will need to get your environment setup:
 - Install **doctl**: `brew install doctl` (or [Linux/Windows](https://www.digitalocean.com/docs/apis-clis/doctl/how-to/install/))
 - Install **helm**: `brew install helm` (or [Linux/Windows](https://helm.sh/docs/intro/install/))
 - Install **jq**: `brew install jq` or `sudo apt install jq`
+- Install **base64**: `brew install base64` 
 
 # Cluster setup
 
