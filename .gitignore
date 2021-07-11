@@ -8,6 +8,5 @@ keys.yml
 *.key
 kubectl
 kubectl.sha256
-scripts/dashboard/values.yml
 assets/logo.psd
 snapshot.bin
