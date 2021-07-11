@@ -246,7 +246,7 @@ _Note: I don't really use this dashboard much and primarily just use [k9s](https
 <br>I have been using CPU optimized node pool with 16GB of RAM and 8vCPUs. It's too early to tell if this is too powerful or not, but seems to perform well so far.
 
 **How many validators can I run per node?**
-<br>This is up in the air, but I think it is safe to run 2-3 validators per node but this could change over time. I have yet to see more than one validator enter a CG per node and the CPU has barely climbed over 25% on average with occasional spikes up to 50%.
+<br>I believe it is safe to run 2-3 validators per node but this could change over time. I have yet to see more than one validator enter a CG per node and the CPU has barely climbed over 25% on average with occasional spikes up to 50%.
 
 **Why does my `nat_type` say `unknown`?**
 <br>This might seem concerning, but it's as expected. It has no effect on validator penalties. Since we are dealing with k8s and its complex networking setup, we have to give each validator a unique `NAT_EXTERNAL_PORT` (using [dyanmic-hostports](https://github.com/0blu/dynamic-hostports-k8s)) to bypass the miner's auto-NAT detection. This avoids it from being relayed but also defaults to `unknown`. It also means your validator will show up with a cool 🏴‍☠️ on the validator explorer 😎.
