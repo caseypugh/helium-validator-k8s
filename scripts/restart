@@ -1,5 +1,8 @@
 #!/bin/bash
-cd $(dirname $0)
+
+set -e
+
+cd "$(dirname "$0")" 
 source helper
 source ../.env
 
@@ -16,12 +19,12 @@ replica_id=$2
 start_index=0
 validator_count=$(kubectl get pods -n $NAMESPACE | grep -c "validator")
 
-if [ ! -z $replica_id ]; then
+if [ -n "$replica_id" ]; then
   start_index=$replica_id
   validator_count=$((replica_id + 1))
 fi
 
-for ((i = $start_index; i < $validator_count; i++)); do
+for ((i = start_index; i < validator_count; i++)); do
   pod="validator-$i"
 
   if [[ $CMD == "pod" ]] || [[ $CMD == "validator" ]]; then 

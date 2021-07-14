@@ -7,13 +7,15 @@
 # borrowed liberally from:
 # https://github.com/digitalocean/marketplace-kubernetes/blob/master/stacks/kube-prometheus-stack/deploy.sh
 
-cd $(dirname $0)
+set -e
+
+cd "$(dirname "$0")"
+
 source ../helper
 source ../../.env
 
-GRAFANA_PORT=$GRAFANA_PORT
 # Set default port
-if [ -z $GRAFANA_PORT ]; then
+if [ -z "$GRAFANA_PORT" ]; then
   GRAFANA_PORT=3000
 fi
 

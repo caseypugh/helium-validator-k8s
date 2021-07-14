@@ -17,12 +17,12 @@ function label {
 
 function container_validator_version {
   replica=$1
-  kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -n $NAMESPACE -- /bin/sh -c "miner versions" | egrep -o "[0-9]+.[0-9]+.[0-9]+" | xargs
+  kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -n $NAMESPACE -- /bin/sh -c "miner versions" | grep -oE "[0-9]+.[0-9]+.[0-9]+" | xargs
 }
 
 function get_miner_name {
   replica=$1
-  kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -n $NAMESPACE -- /bin/sh -c "miner info name" | egrep -o "[a-z]+-[a-z]+-[a-z]+" | xargs
+  kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -n $NAMESPACE -- /bin/sh -c "miner info name" | grep -oE "[a-z]+-[a-z]+-[a-z]+" | xargs
 }
 
 function get_miner_address {
@@ -37,11 +37,11 @@ function is_in_consensus {
 
 function grafana_api {
   path=$1
-  curl -s --user admin:prom-operator -H "Content-Type: application/json" http://localhost:${GRAFANA_PORT}${path}
+  curl -s --user admin:prom-operator -H "Content-Type: application/json" "http://localhost:${GRAFANA_PORT}${path}"
 }
 
 function grafana_api_post {
   path=$1
   data=$2
-  curl -s --user admin:prom-operator -H "Content-Type: application/json" --data $data "http://localhost:$GRAFANA_PORT$path"
+  curl -s --user admin:prom-operator -H "Content-Type: application/json" --data "$data" "http://localhost:$GRAFANA_PORT$path"
 }

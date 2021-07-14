@@ -4,18 +4,17 @@
 # Otherwise you'll want to delete and recreate the pods manually
 #
 
-cd $(dirname $0)
+cd "$(dirname "$0")"
 
 source helper
 source ../.env
 
 CMD=$1
-POD_NAME=validator
 
 context=$(kubectl config current-context)
 echo; echo -e "${GREEN}Deploying to $context...${NC}"
 
-if [ -z $NAMESPACE ]; then
+if [ -z "$NAMESPACE" ]; then
   echo "No namespace set. Defaulting to helium."
   NAMESPACE="helium"
 fi
@@ -47,26 +46,24 @@ fi
 # Abort on errors from here on out
 set -e
 
-echo "Check if $NAMESPACE exists"
 # Automatically create the namespace if it doesn't exist
+echo "Checking if $NAMESPACE exists..."
 namespace_exists=$(kubectl get namespaces | grep $NAMESPACE)
 if [ -z "$namespace_exists" ]; then
   kubectl create ns $NAMESPACE
 fi
 
-echo "Check if dynamic-hostports exists"
+echo "Checking if dynamic-hostports exists..."
 hostports_exists=$(kubectl get pods --all-namespaces | grep dynamic-hostports)
 if [ -z "$hostports_exists" ]; then
-  echo "Install dynamic-hostports"
+  echo "Installing dynamic-hostports"
   kubectl apply -f https://raw.githubusercontent.com/0blu/dynamic-hostports-k8s/master/deploy.yaml
 fi
 
-prometheus_namespace=kube-prometheus-stack
-echo "Check if $prometheus_namespace exists"
+prometheus_namespace="kube-prometheus-stack"
+echo "Checking if $prometheus_namespace exists..."
 prom_exists=$(kubectl get pods --all-namespaces | grep $prometheus_namespace)
 if [ -z "$prom_exists" ]; then
-  echo "Install $prometheus_namespace"
-  kubectl create ns $prometheus_namespace
   ./scripts/dashboard/setup
 fi
 
@@ -104,7 +101,7 @@ fi
 
 # Replace TOTAL_VALIDATORS with value from our selected environment variable
 # Awkward replace command to make WSL & Mac compatible
-{ rm $validator_yml && awk '{gsub("<TOTAL_VALIDATORS>", "'$total_validators'", $0); print}' > $validator_yml; } < $validator_yml
+{ rm "$validator_yml" && awk '{gsub("<TOTAL_VALIDATORS>", "'$total_validators'", $0); print}' > "$validator_yml"; } < "$validator_yml"
 
 # Apply the new configurations
 kubectl apply -f $validator_yml -n $NAMESPACE
