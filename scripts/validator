@@ -14,7 +14,7 @@ source ../.env
 if [[ $CMD == "info" ]]; then
   replica_id=$2
   start_index=0
-  validator_count=$(kubectl get pods | grep -c "validator")
+  validator_count=$(kubectl get pods -n $NAMESPACE | grep -c "validator")
 
   if [ -n "$replica_id" ]; then
     start_index=$replica_id

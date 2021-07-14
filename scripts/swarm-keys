@@ -1,14 +1,14 @@
 #!/bin/bash
-set -e 
-
-cd "$(dirname "$0")"
+cwd=$(dirname "$0"); cd $cwd;
+source helper
 source ../.env
 
 CMD=$1
 
 # Sign into 1password if enabled
 op_logged_in=
-hasop=$(which op)
+hasop=$(command -v op)
+
 if [ -n "$hasop" ] && [ -n "$OP_VAULT_UUID" ]; then
   op_logged_in=$(op list vaults)
   if [ -z "$op_logged_in" ]; then
@@ -25,7 +25,7 @@ if [ -n "$hasop" ] && [ -n "$OP_VAULT_UUID" ]; then
 fi
 
 if [[ $CMD == "sync" ]]; then
-  echo; echo "Downloading swarm_keys from cluster..."
+  echo; echo -e "$(label "Downloading swarm_keys from cluster..." $GREEN)"
 
   # Loop through all the validators
   validator_count=$(kubectl get pods -n $NAMESPACE | grep -c "validator")
@@ -63,7 +63,7 @@ if [[ $CMD == "sync" ]]; then
         echo "swarm_key already saved in 1password"
       fi
     else
-      echo; echo "Make sure you backup keys/$miner_name/swarm_key in 1password or place of choice."
+      echo; echo -e "$(label "Make sure you backup keys/$miner_name/swarm_key in 1password or place of choice." $RED)"
     fi
   done
 

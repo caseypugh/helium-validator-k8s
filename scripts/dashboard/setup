@@ -24,7 +24,7 @@ cwd=$(dirname "$0")
 
 k8s_folder=$(cd "$cwd"; cd ../../k8s/grafana; pwd)
 
-if ! grep -q $NAMESPACE "$(kubectl get namespaces --all-namespaces)"; then
+if ! kubectl get namespaces --all-namespaces | grep -q $NAMESPACE; then
   echo "Creating $NAMESPACE namespace"
   kubectl create ns "$NAMESPACE"
 fi
