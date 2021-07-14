@@ -47,22 +47,27 @@ fi
 # Abort on errors from here on out
 set -e
 
+echo "Check if $NAMESPACE exists"
 # Automatically create the namespace if it doesn't exist
 namespace_exists=$(kubectl get namespaces | grep $NAMESPACE)
 if [ -z "$namespace_exists" ]; then
   kubectl create ns $NAMESPACE
 fi
 
-# Install dynamic-hostports
+echo "Check if dynamic-hostports exists"
 hostports_exists=$(kubectl get pods --all-namespaces | grep dynamic-hostports)
 if [ -z "$hostports_exists" ]; then
+  echo "Install dynamic-hostports"
   kubectl apply -f https://raw.githubusercontent.com/0blu/dynamic-hostports-k8s/master/deploy.yaml
 fi
 
-# Install kube-prometheus-stack
-prom_exists=$(kubectl get pods --all-namespaces | grep kube-prometheus-stack)
+prometheus_namespace=kube-prometheus-stack
+echo "Check if $prometheus_namespace exists"
+prom_exists=$(kubectl get pods --all-namespaces | grep $prometheus_namespace)
 if [ -z "$prom_exists" ]; then
-  ./dashboard/setup
+  echo "Install $prometheus_namespace"
+  kubectl create ns $prometheus_namespace
+  ./scripts/dashboard/setup
 fi
 
 # Replace our <VALIDATOR_SETUP_SCRIPT> variable w/ contents of validator-setup.sh
@@ -80,12 +85,12 @@ grep -o '^[^#]*' $setup_script > $setup_script_tmp
 # Add tab spacing to the bash script to match yml
 repl=$(while IFS= read -r line; do echo -e "              $line"; done < $setup_script_tmp)
 
-# Replace the target string in the yml
+echo "Replace the target string in the yml"
 while IFS= read -r line; do
   echo "${line//$target/$repl}"
 done < $validator_tpl > $validator_yml
 
-# Get total validators needed for current context/environment
+echo "Get total validators needed for current context/environment"
 current_context=$(kubectl config current-context)
 total_validators=1
 if [[ "$current_context" == "$MAINNET_CLUSTER" ]]; then
