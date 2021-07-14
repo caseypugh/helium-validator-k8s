@@ -4,7 +4,7 @@
 # info|peers|cg_perf|bash|logs|reset_db|kickstart
 #
 
-cd $(dirname $0)
+cd "$(dirname "$0")" || exit
 
 CMD=$1
 
@@ -14,14 +14,14 @@ source ../.env
 if [[ $CMD == "info" ]]; then
   replica_id=$2
   start_index=0
-  validator_count=$(kubectl get pods | grep -c "validator")
+  validator_count=$(kubectl get pods -n $NAMESPACE | grep -c "validator")
 
-  if [ ! -z $replica_id ]; then
+  if [ -n "$replica_id" ]; then
     start_index=$replica_id
     validator_count=$((replica_id + 1))
   fi
 
-  for ((i = $start_index; i < $validator_count; i++)); do
+  for ((i = start_index; i < validator_count; i++)); do
     pod="validator-$i"
     echo; echo -e "${GREEN}Pod:${NC} $pod"
 
@@ -48,7 +48,7 @@ if [[ $CMD == "info" ]]; then
 elif [[ $CMD == "peers" ]]; then
   # FIXME DRY up this "with each validator" loop
   validator_count=$(kubectl get pods | grep -c "validator")
-  for ((i = 0; i < $validator_count; i++)); do
+  for ((i = 0; i < validator_count; i++)); do
     pod="validator-$i"
     echo; echo "Pod: $pod"
     kubectl exec -it $pod -c validator -- sh -c "miner peer book -s"
@@ -61,26 +61,26 @@ elif [[ $CMD == "cg_perf" ]]; then
 
 elif [[ $CMD == "bash" ]]; then
   pod_id=$2
-  kubectl exec -it validator-$pod_id -c validator -- /bin/ash
+  kubectl exec -it "validator-$pod_id" -c validator -- /bin/ash
 
 elif [[ $CMD == "logs" ]]; then
   pod_id=$2
-  kubectl exec validator-$pod_id -c validator -- tail -F /var/data/log/{console,error,crash}.log
+  kubectl exec "validator-$pod_id" -c validator -- tail -F /var/data/log/{console,error,crash}.log
 
 elif [[ $CMD == "reset_db" ]]; then
   pod_id=$2
 
-  if [ -z $pod_id ]; then
+  if [ -z "$pod_id" ]; then
     echo "$0: missing pod_id (aka pod replica number)"
     exit 1
   fi
 
-  kubectl exec -it validator-$pod_id -c validator -- sh -c "cd /var/data; rm -rf *.db; rm -rf blockchain_swarm; rm -rf log; rm -rf lost+found;"
-  kubectl delete pod validator-$pod_id &
+  kubectl exec -it "validator-$pod_id" -c validator -- sh -c "cd /var/data; rm -rf *.db; rm -rf blockchain_swarm; rm -rf log; rm -rf lost+found;"
+  kubectl delete pod "validator-$pod_id" &
 
 elif [[ $CMD == "kickstart" ]]; then
   pod_id=$2
-  kubectl exec -it validator-$pod_id -c validator -- sh -c "miner peer connect /ip4/3.137.173.26/tcp/2154"
+  kubectl exec -it "validator-$pod_id" -c validator -- sh -c "miner peer connect /ip4/3.137.173.26/tcp/2154"
 
 elif [[ $CMD == "top" ]]; then
   kubectl top pods --all-namespaces

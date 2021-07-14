@@ -12,7 +12,6 @@ set -e
 
 CMD=$1
 
-
 ################################################################################
 # chart
 ################################################################################
@@ -21,17 +20,23 @@ CHART="prometheus-community/kube-prometheus-stack"
 CHART_VERSION="16.12.1"
 NAMESPACE="kube-prometheus-stack"
 
+cwd=$(dirname "$0")
 
-cwd=$(dirname $0)
+k8s_folder=$(cd "$cwd"; cd ../../k8s/grafana; pwd)
 
-k8s_folder=$(cd $cwd; cd ../../k8s/grafana; pwd)
-
-if [[ "$CMD" == "update-dashboard" ]] || [ -z $CMD ]; then
-  kubectl apply -n "$NAMESPACE" -f $k8s_folder/grafana-helium-api-datasource.yml
-  kubectl apply -n "$NAMESPACE" -f $k8s_folder/grafana-validator-dashboard.yml
+if ! kubectl get namespaces --all-namespaces | grep -q $NAMESPACE; then
+  echo "Creating $NAMESPACE namespace"
+  kubectl create ns "$NAMESPACE"
 fi
 
-if [ -z $CMD ]; then
+if [[ "$CMD" == "update-dashboard" ]] || [ -z "$CMD" ]; then
+  echo "Adding Helium API data source"
+  kubectl apply -n "$NAMESPACE" -f "$k8s_folder/grafana-helium-api-datasource.yml"
+  echo "Adding Helium validator dashboard"
+  kubectl apply -n "$NAMESPACE" -f "$k8s_folder/grafana-validator-dashboard.yml"
+fi
+
+if [ -z "$CMD" ]; then
   helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
   helm repo update >/dev/null
   
@@ -40,8 +45,8 @@ if [ -z $CMD ]; then
     echo "Using local values.yml file $local_values"
     values=$local_values
   else
-    echo "Using default DigitalOcean values.yml file $default_values"
     values="https://raw.githubusercontent.com/digitalocean/marketplace-kubernetes/master/stacks/kube-prometheus-stack/values.yml"
+    echo "Using default DigitalOcean values.yml file $values"
   fi
 
   helm upgrade "$STACK" "$CHART" \
@@ -54,9 +59,8 @@ if [ -z $CMD ]; then
 
 elif [[ "$CMD" == "uninstall" ]]; then
 
-  kubectl delete -n "$NAMESPACE" -f $k8s_folder/grafana-helium-api-datasource.yml
-  kubectl delete -n "$NAMESPACE" -f $k8s_folder/grafana-validator-dashboard.yml
+  kubectl delete -n "$NAMESPACE" -f "$k8s_folder/grafana-helium-api-datasource.yml"
+  kubectl delete -n "$NAMESPACE" -f "$k8s_folder/grafana-validator-dashboard.yml"
 
-  helm uninstall "$STACK" "$CHART" \
-    --namespace "$NAMESPACE"
+  helm uninstall "$STACK" "$CHART" --namespace "$NAMESPACE"
 fi
