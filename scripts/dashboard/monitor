@@ -7,9 +7,7 @@
 # borrowed liberally from:
 # https://github.com/digitalocean/marketplace-kubernetes/blob/master/stacks/kube-prometheus-stack/deploy.sh
 
-set -e
-
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 
 source ../helper
 source ../../.env
