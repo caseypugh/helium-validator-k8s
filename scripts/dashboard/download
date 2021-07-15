@@ -42,7 +42,7 @@ data:
   validator-dashboard.json: |-
 EOM
 
-echo "    $dashboard" >> $dashboard_yml
+echo "$dashboard" | jq '.' | sed 's/^/    /' >> $dashboard_yml
 
 echo -e "Dashboard downloaded to $(label "k8s/grafana/grafana-validator-dashboard.yml" $GREEN)"
 echo
