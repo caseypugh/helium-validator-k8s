@@ -4,7 +4,7 @@
 # Otherwise you'll want to delete and recreate the pods manually
 #
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 
 source helper
 source ../.env
@@ -45,10 +45,12 @@ fi
 
 current_context=$(kubectl config current-context)
 total_validators=1
+TESTNET=
 if [[ "$current_context" == "$MAINNET_CLUSTER" ]]; then
   total_validators=$TOTAL_MAINNET_VALIDATORS
 elif [[ "$current_context" == "$TESTNET_CLUSTER" ]]; then
   total_validators=$TOTAL_TESTNET_VALIDATORS
+  TESTNET=1
 else
   echo "Warning, no TOTAL_*_VALIDATORS configured; defaulting to $total_validators"
   echo "Check that your .env file has all the keys from .env.sample"
@@ -100,6 +102,12 @@ done < $validator_tpl > $validator_yml
 # Replace TOTAL_VALIDATORS with value from our selected environment variable
 # Awkward replace command to make WSL & Mac compatible
 { rm "$validator_yml" && awk '{gsub("<TOTAL_VALIDATORS>", "'$total_validators'", $0); print}' > "$validator_yml"; } < "$validator_yml"
+
+# Use testnet validator image
+if [ -n "$TESTNET" ]; then
+  TESTNET_IMG=latest-val-amd64
+  { rm "$validator_yml" && awk '{gsub("latest-validator-amd64", "'$TESTNET_IMG'", $0); print}' > "$validator_yml"; } < "$validator_yml"
+fi
 
 # Apply the new configurations
 kubectl apply -f $validator_yml -n $NAMESPACE

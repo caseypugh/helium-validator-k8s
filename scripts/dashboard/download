@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -e
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 echo
 
 source ../../.env
@@ -18,16 +17,16 @@ function load_panel {
 
 # Fetch the UID of our dashboard
 dash_name="Helium Validator Dashboard"
-response=$(grafana_api "/api/search?query=$dash_name")
+response=$(grafana_api /api/search?query=$dash_name)
 dash_uid=$(echo "$response" | jq -r -c --arg name "$dash_name" '[ .[] | select( .title | contains($name)) ][0].uid')
 
 if [[ $dash_uid == "null" ]] || [ -z "$dash_uid" ]; then
-  echo "No Helium dashboard found under the name '$dash_name"
+  echo "No Helium dashboard found under the name '$dash_name'"
   exit 1
 fi
 
 echo -e "Fetching latest $(label "$dash_name" $GREEN) ..."
-response=$(grafana_api "/api/dashboards/uid/$dash_uid")
+response=$(grafana_api /api/dashboards/uid/$dash_uid)
  
 dashboard_yml=$CONFIG_PATH/grafana-validator-dashboard.yml
 dashboard=$(echo "$response" | jq -c --arg title "$dash_name" '.dashboard | .uid = null | .version = 1 | .title = $title')
@@ -43,7 +42,7 @@ data:
   validator-dashboard.json: |-
 EOM
 
-echo "    $dashboard" >> $dashboard_yml
+echo "$dashboard" | jq '.' | sed 's/^/    /' >> $dashboard_yml
 
 echo -e "Dashboard downloaded to $(label "k8s/grafana/grafana-validator-dashboard.yml" $GREEN)"
 echo
