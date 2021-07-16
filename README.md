@@ -1,20 +1,18 @@
-# Helium Validators on Kubernetes (k8s)
+<h1>Helium Validators on Kubernetes (k8s)</h1>
 
 ![](assets/logo.png)
 
 This is a DigitalOcean-specific [Kubernetes (k8s)](https://kubernetes.io/) setup for running a cluster of [Helium validators](https://www.helium.com/stake). Some modifications are necessary to run on other Kubernetes hosts.
 
-Development is still early and pull requests are welcome!
+Development is still early and pull requests are welcome! ✌️
 
-### Table of contents
-- [Helium Validators on Kubernetes (k8s)](#helium-validators-on-kubernetes-k8s)
-    - [Table of contents](#table-of-contents)
 - [Local environment setup](#local-environment-setup)
+  - [Extra tools](#extra-tools)
 - [Cluster setup](#cluster-setup)
   - [Deploy the validators](#deploy-the-validators)
   - [Automatic updates](#automatic-updates)
   - [Modify disk space](#modify-disk-space)
-- [Validator Management](#validator-management)
+- [Validator management](#validator-management)
   - [Check status](#check-status)
   - [Add a new validator](#add-a-new-validator)
   - [Staking validators](#staking-validators)
@@ -22,10 +20,12 @@ Development is still early and pull requests are welcome!
   - [Replace a swarm key](#replace-a-swarm-key)
 - [Monitoring](#monitoring)
   - [Accessing Grafana](#accessing-grafana)
-  - [Setting up the validator dashboard](#setting-up-the-validator-dashboard)
-  - [Receiving Alerts](#receiving-alerts)
+  - [Validator dashboard & alerting](#validator-dashboard--alerting)
   - [Kubernetes dashboard (optional)](#kubernetes-dashboard-optional)
-- [Troubleshooting](#troubleshooting)
+- [Misc](#misc)
+  - [FAQ](#faq)
+  - [How to contribute](#how-to-contribute)
+  - [Thanks](#thanks)
 
 # Local environment setup
 All the core essentials you will need to get your environment setup:
@@ -34,6 +34,13 @@ All the core essentials you will need to get your environment setup:
 - Install **doctl**: `brew install doctl` (or [Linux/Windows](https://www.digitalocean.com/docs/apis-clis/doctl/how-to/install/))
 - Install **helm**: `brew install helm` (or [Linux/Windows](https://helm.sh/docs/intro/install/))
 - Install **jq**: `brew install jq` or `sudo apt install jq`
+- Install **base64**: `brew install base64` 
+
+## Extra tools
+Some very helpful tools to make your Kubernetes life easier:
+- [🐶k9s](https://github.com/derailed/k9s) - A must have! K9s provides a terminal UI to interact with your Kubernetes clusters.
+- [BotKube](https://www.botkube.io/) - BotKube is a messaging bot for monitoring and debugging Kubernetes clusters.
+
 
 # Cluster setup
 
@@ -110,7 +117,7 @@ kubectl patch pvc <your-pvc-name> -p '{ "spec": { "resources": { "requests": { "
 ```
 
 
-# Validator Management
+# Validator management
 If you look inside the `/scripts` you'll see there are a bunch of helper scripts written to make validator management easier. Below are some of the most common uses: 
 
 ## Check status
@@ -185,7 +192,7 @@ scripts/swarm-keys replace $replica_id $animal_hotspot_name
 This will update the swarm_key and restart the specified pod replica.
 
 # Monitoring 
-
+![](assets/dashboard.png)
 
 ## Accessing Grafana
 Grafana and prometheus should already be running thanks to the deploy script. Now you can setup a proxy to your Grafana dashboard using:
@@ -203,18 +210,23 @@ Alertmanager: http://localhost:9093
 
 Visit [http://localhost:3000](http://localhost:3000) to see your Grafana dashboard.
 
-## Setting up the validator dashboard
-![](assets/dashboard.png)
+## Validator dashboard & alerting
+There is a custom validator dashboard that should have most everything you need. When in grafana, search for "Helium Validator Dashboard". There are a bunch of alerts setup already (i.e. get notified when a validator enters consensus). 
 
-Now that Grafana is setup and you have port forwarding running, let's get your Helium validator dashboard setup. Run this command:
+I plan to continue to make improvements to this dashboard often, so if you want those updates too, update your repo with the latest and then run:
+
+```sh
+scripts/dashboard/setup update-dashboard
 ```
-scripts/dashboard/sync
+
+_Note: This will automatically update the "Helium Validator Dashboard". If you made any modifications to that dashboard, they will be erased. Make a backup copy of your modified dashboard before updating._
+
+Also, if you have improvements you'd like to make to the validator dashboard, please make a PR! After making edits, you can "sync" those changes to this repo by using
+
+```sh
+scripts/dashboard/download
+# This will automatically download the Helium Validator Dashboard to k8s/grafana/grafana-validator-dashboard.yml
 ```
-
-## Receiving Alerts
-There are already a bunch of alerts setup in this dashboard, but if you'd like to receive push notifications (Discord, Slack, etc) whenever there are alerts, create a new [notification channel](http://localhost:3000/alerting/notifications). 
-
-Once created, set the `GRAFANA_NOTIFICATION_CHANNEL` env var to the `id` of your notification (you can find it in the URL). Then just rerun `scripts/dashboard/sync` and it will automatically update all the panel alerts to the notification channel.
 
 ## Kubernetes dashboard (optional)
 
@@ -224,11 +236,47 @@ DigitalOcean has the Kubernetes Dashboard setup for you already, but if you're r
 scripts/setup-k8s-dashboard
 ```
 
-_Note: I don't really use this dashboard much and primarily just use [k9s](https://github.com/derailed/k9s)_
+_Note: I don't really use this dashboard much and primarily just use [k9s](https://github.com/derailed/k9s) and Grafana_
 
-# Troubleshooting
-Some very helpful tools to make your Kubernetes life easier
-- [k9s](https://github.com/derailed/k9s) - K9s provides a terminal UI to interact with your Kubernetes clusters.
-- [BotKube](https://www.botkube.io/) - BotKube is a messaging bot for monitoring and debugging Kubernetes clusters.
+# Misc
 
-More coming soon...
+## FAQ
+
+**Which DigitalOcean Node Pool should I use?**
+<br>I have been using CPU optimized node pool with 16GB of RAM and 8vCPUs. It's too early to tell if this is too powerful or not, but seems to perform well so far.
+
+**How many validators can I run per node?**
+<br>I believe it is safe to run 2-3 validators per node but this could change over time. I have yet to see more than one validator enter a CG per node and the CPU has barely climbed over 25% on average with occasional spikes up to 50%.
+
+**Why does my `nat_type` say `unknown`?**
+<br>This might seem concerning, but it's as expected. It has no effect on validator penalties. Since we are dealing with k8s and its complex networking setup, we have to give each validator a unique `NAT_EXTERNAL_PORT` (using [dyanmic-hostports](https://github.com/0blu/dynamic-hostports-k8s)) to bypass the miner's auto-NAT detection. This avoids it from being relayed but also defaults to `unknown`. It also means your validator will show up with a cool 🏴‍☠️ on the validator explorer 😎.
+
+**k8s adds a lot overhead. Do the validators receive a lot of penalties?**
+<br>Not enough data but it looks positive. Have had a few elections and majority have had zero penalties, and one lasted 9 rounds and accrued ~0.9 performance penalty. If you are using this setup, please share your data!
+
+**How do I move a validator to a different node?**
+<br>Since the validators are a [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) with no node affinity, simply delete the pod and k8s will evenly distribute the validator across your node pool.
+
+**How do I make sure a validator always has the same IP?**
+<br>A pod will always have the same IP unless it switches to a new node. So as long as you arent moving pods around, then it should stay the same. Improvements are welcome! i.e. You could make sure a pod has a specific node affinity, or use a LoadBalancer to assign a static IP per validator (which would cost $). 
+
+_Note: All the scripts for managing validators (e.g. upgrading to a new validator version) will make sure to never restart a validator that is currently in consensus._
+
+**Can I copy a snapshot from one validator to another?**
+<br>Yes!
+```sh
+scripts/snapshot copy $replica_from $replica_to
+
+# Example: This will take a snapshot from validator-0 and import into validator-2
+scripts/snapshot copy 0 2
+```
+
+**Can the pods use the animal hotspot name instead of "validator-3"?**
+<br>It's technically possible, but would be a lot of refactoring. I highly recommend just using Grafana to figure out the names of your validators (or use `scripts/validator info $replica_id`)
+
+## How to contribute
+
+PRs for bug fixes, improvements, and new features are all welcome. And please feel free to file [GitHub issues](https://github.com/caseypugh/helium-validator-k8s/issues) for bugs / enhancements or to check out the loose roadmap.
+
+## Thanks
+Huge thanks to the [DeWi team](https://dewialliance.medium.com/announcing-the-inaugural-dewi-grant-recipients-56b44b9b9b66) for helping fund this project. And special shoutout to [jamiew](https://twitter.com/jamiew)'s [validator-exporter-k8s](https://github.com/jamiew/validator-exporter-k8s) and [pootify](https://github.com/pootify).

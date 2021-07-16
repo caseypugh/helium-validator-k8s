@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd $(dirname $0)
+cd "$(dirname "$0")" || exit
 source helper
 source ../.env
 
@@ -8,7 +8,8 @@ CMD=$1
 
 pattern="pod|validator|exporter"
 if [[ ! $CMD =~ $pattern ]]; then
-  echo "restart: Unknown command $CMD"
+  echo "$0: Unknown command $CMD"
+  echo "Try one of: $pattern"
   exit 1
 fi
 
@@ -16,12 +17,12 @@ replica_id=$2
 start_index=0
 validator_count=$(kubectl get pods -n $NAMESPACE | grep -c "validator")
 
-if [ ! -z $replica_id ]; then
+if [ -n "$replica_id" ]; then
   start_index=$replica_id
   validator_count=$((replica_id + 1))
 fi
 
-for ((i = $start_index; i < $validator_count; i++)); do
+for ((i = start_index; i < validator_count; i++)); do
   pod="validator-$i"
 
   if [[ $CMD == "pod" ]] || [[ $CMD == "validator" ]]; then 

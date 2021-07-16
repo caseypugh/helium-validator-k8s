@@ -22,7 +22,7 @@ spec:
       shareProcessNamespace: true # otherwise you'll end up with mountains of zombie processes
       containers:
         - name: validator-exporter
-          image: jamiedubs/validator-exporter:latest
+          image: jamiedubs/validator-exporter-k8s:latest
           # imagePullPolicy: Never # if using local image; build in `validator-exporter` repo
           imagePullPolicy: Always
           ports:

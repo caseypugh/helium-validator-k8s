@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: helium-api-datasource
+  labels:
+    grafana_datasource: "1"
+data:
+  datasources.yaml: |-
+    apiVersion: 1
+    datasources:
+    - name: Helium API
+      type: marcusolsson-json-datasource
+      typeLogoUrl: public/plugins/marcusolsson-json-datasource/img/logo.svg
+      access: proxy
+      url: https://api.helium.io/v1/
+      isDefault: false
+      jsonData:
+        timeout: "10"
+      readOnly: true

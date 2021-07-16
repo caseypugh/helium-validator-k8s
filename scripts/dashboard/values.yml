@@ -1,4 +1,5 @@
 # prometheus-community/kube-prometheus-stack
+# Reference: https://github.com/grafana/helm-charts/tree/main/charts/grafana
 
 grafana:
   persistence:
@@ -9,4 +10,10 @@ grafana:
     enabled: true
   plugins:
     - marcusolsson-json-datasource
-    # - grafana-image-renderer
+  sidecar:
+    dashboards:
+      enabled: true
+      provider:
+        allowUiUpdates: true
+    datasources:
+      enabled: true

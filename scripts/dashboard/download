@@ -1,0 +1,48 @@
+#!/bin/bash
+
+cd "$(dirname "$0")" || exit
+echo
+
+source ../../.env
+source ../helper
+
+CONFIG_PATH=../../k8s/grafana
+
+function load_panel {
+  json=$1
+  panel="$(cat $CONFIG_PATH/$json)"
+  echo "$panel"
+}
+
+
+# Fetch the UID of our dashboard
+dash_name="Helium Validator Dashboard"
+response=$(grafana_api /api/search?query=$dash_name)
+dash_uid=$(echo "$response" | jq -r -c --arg name "$dash_name" '[ .[] | select( .title | contains($name)) ][0].uid')
+
+if [[ $dash_uid == "null" ]] || [ -z "$dash_uid" ]; then
+  echo "No Helium dashboard found under the name '$dash_name'"
+  exit 1
+fi
+
+echo -e "Fetching latest $(label "$dash_name" $GREEN) ..."
+response=$(grafana_api /api/dashboards/uid/$dash_uid)
+ 
+dashboard_yml=$CONFIG_PATH/grafana-validator-dashboard.yml
+dashboard=$(echo "$response" | jq -c --arg title "$dash_name" '.dashboard | .uid = null | .version = 1 | .title = $title')
+
+cat > $dashboard_yml <<- EOM
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: validator-dashboards
+  labels:
+    grafana_dashboard: "1"
+data:
+  validator-dashboard.json: |-
+EOM
+
+echo "$dashboard" | jq '.' | sed 's/^/    /' >> $dashboard_yml
+
+echo -e "Dashboard downloaded to $(label "k8s/grafana/grafana-validator-dashboard.yml" $GREEN)"
+echo

@@ -7,12 +7,13 @@
 # borrowed liberally from:
 # https://github.com/digitalocean/marketplace-kubernetes/blob/master/stacks/kube-prometheus-stack/deploy.sh
 
-cd $(dirname $0)
+cd "$(dirname "$0")" || exit
+
+source ../helper
 source ../../.env
 
-GRAFANA_PORT=$GRAFANA_PORT
 # Set default port
-if [ -z $GRAFANA_PORT ]; then
+if [ -z "$GRAFANA_PORT" ]; then
   GRAFANA_PORT=3000
 fi
 
@@ -21,9 +22,9 @@ kubectl port-forward svc/kube-prometheus-stack-prometheus 9090 -n kube-prometheu
 kubectl port-forward svc/kube-prometheus-stack-alertmanager 9093 -n kube-prometheus-stack &
 
 echo "Visit =>"
-echo "Grafana: http://localhost:$GRAFANA_PORT -- user/pass=admin/prom-operator"
-echo "Prometheus query tool: http://localhost:9090"
-echo "Alertmanager: http://localhost:9093"
+echo -e "$(label 'Grafana' $GREEN): http://localhost:$GRAFANA_PORT -- user/pass=admin/prom-operator"
+echo -e "$(label 'Prometheus' $GREEN): http://localhost:9090"
+echo -e "$(label 'Alertmanager' $GREEN): http://localhost:9093"
 echo
 wait
 echo "All done"
