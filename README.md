@@ -106,6 +106,8 @@ validator-1   2/2     Running   0          5m
 
 Validators will automatically update themselves whenever a new version is released. If a validator is currently in consensus, it will not update until it is out of consensus.
 
+To disable auto updates, set the `ENABLE_AUTO_UPDATE` env var in your `.env` file to `false`
+
 ## Modify disk space
 By default, every validator will have 20GB of space each. If the validators start to need more space, you will have to modify each of your PVCs:
 ```sh

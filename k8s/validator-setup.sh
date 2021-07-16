@@ -52,62 +52,66 @@ while true; do
 done &
 
 # Version check every 15 minutes
-while true; do
-  # Install jq to make our lives easier
-  if [ -z "$(which jq)" ]; then
-    echo "[Version] Installing jq dependency";
-    wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 --output-document="/usr/bin/jq";
-    chmod +x /usr/bin/jq;
-  fi;
-
-  in_consensus="$($v info in_consensus)";
-  if [[ $in_consensus == "true" ]]; then
-    echo "[Version] Validator currently in consensus. Skipping version check.";
-    sleep 900;
-    continue;
-  fi;
-
-  container_version="$(miner versions | grep -oE "\d+\.\d+\.\d+")";
-  if [ -z "$container_version" ]; then
-    echo "[Version] Couldn't fetch version";
-    sleep 30;
-    continue;
-  fi;
-
-  echo "[Version] Checking if validator needs to be updated ($container_version)";
-  QUAY_URL="https://quay.io/api/v1/repository/team-helium/validator/tag/?limit=10&page=1&onlyActiveTags=true";
-  ARCH=amd;
-  quay_response=$(wget -qO- "$QUAY_URL");
-
-  if [ -z "$quay_response" ]; then
-    echo "[Version] Bad response from quay.io $quay_response";
-    sleep 30;
-  else
-    current_version_sha=$(echo "$quay_response" | jq -r -c --arg ARCH "$ARCH" --arg VER "$container_version" '[ .tags[] | select( .name | contains($ARCH) and contains($VER)) ][0].manifest_digest');
-    current_version_name=$(echo "$quay_response" | jq -r -c --arg ARCH "$ARCH" --arg VER "$container_version" '[ .tags[] | select( .name | contains($ARCH) and contains($VER)) ][0].name');
-
-    IMAGE_NAME_SEARCH="latest-validator-";
-    if [[ "$current_version_name" == *"testnet_val"* ]]; then
-      IMAGE_NAME_SEARCH="testnet_val";
+if [[ $VALIDATOR_ENABLE_AUTO_UPDATE == "true" ]]; then
+  while true; do
+    # Install jq to make our lives easier
+    if [ -z "$(which jq)" ]; then
+      echo "[Version] Installing jq dependency";
+      wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 --output-document="/usr/bin/jq";
+      chmod +x /usr/bin/jq;
     fi;
 
-    latest_version_sha=$(echo "$quay_response" | jq -r -c --arg ARCH "$ARCH" --arg NAME "$IMAGE_NAME_SEARCH" '[ .tags[] | select( .name | contains($ARCH) and contains($NAME)) ][0].manifest_digest');
+    in_consensus="$($v info in_consensus)";
+    if [[ $in_consensus == "true" ]]; then
+      echo "[Version] Validator currently in consensus. Skipping version check.";
+      sleep 900;
+      continue;
+    fi;
 
-    if [[ "$current_version_sha" == "$latest_version_sha" ]]; then
-      echo "[Version] Already at latest version $current_version_sha ($container_version)";
+    container_version="$(miner versions | grep -oE "\d+\.\d+\.\d+")";
+    if [ -z "$container_version" ]; then
+      echo "[Version] Couldn't fetch version";
+      sleep 30;
+      continue;
+    fi;
+
+    echo "[Version] Checking if validator needs to be updated ($container_version)";
+    QUAY_URL="https://quay.io/api/v1/repository/team-helium/validator/tag/?limit=10&page=1&onlyActiveTags=true";
+    ARCH=amd;
+    quay_response=$(wget -qO- "$QUAY_URL");
+
+    if [ -z "$quay_response" ]; then
+      echo "[Version] Bad response from quay.io $quay_response";
+      sleep 30;
     else
-      echo "[Version] Out of date!";
-      echo "[Version] Latest $latest_version_sha";
-      echo "[Version] Current $current_version_sha ($container_version)";
-      echo "[Version] Shutting down validator";
-      
-      tail_process=$(pgrep -f "tail -F /var/data");
-      kill "$tail_process";
-      exit 1;
+      current_version_sha=$(echo "$quay_response" | jq -r -c --arg ARCH "$ARCH" --arg VER "$container_version" '[ .tags[] | select( .name | contains($ARCH) and contains($VER)) ][0].manifest_digest');
+      current_version_name=$(echo "$quay_response" | jq -r -c --arg ARCH "$ARCH" --arg VER "$container_version" '[ .tags[] | select( .name | contains($ARCH) and contains($VER)) ][0].name');
+
+      IMAGE_NAME_SEARCH="latest-validator-";
+      if [[ "$current_version_name" == *"testnet_val"* ]]; then
+        IMAGE_NAME_SEARCH="testnet_val";
+      fi;
+
+      latest_version_sha=$(echo "$quay_response" | jq -r -c --arg ARCH "$ARCH" --arg NAME "$IMAGE_NAME_SEARCH" '[ .tags[] | select( .name | contains($ARCH) and contains($NAME)) ][0].manifest_digest');
+
+      if [[ "$current_version_sha" == "$latest_version_sha" ]]; then
+        echo "[Version] Already at latest version $current_version_sha ($container_version)";
+      else
+        echo "[Version] Out of date!";
+        echo "[Version] Latest $latest_version_sha";
+        echo "[Version] Current $current_version_sha ($container_version)";
+        echo "[Version] Shutting down validator";
+        
+        tail_process=$(pgrep -f "tail -F /var/data");
+        kill "$tail_process";
+        exit 1;
+      fi;
+      sleep 900;
     fi;
-    sleep 900;
-  fi;
-done &
+  done &
+else
+  echo "**Validator auto update is DISABLED**"
+fi
 
 echo "Tailing validator logs...";
 tail -F /var/data/log/*.log;

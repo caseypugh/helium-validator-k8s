@@ -63,7 +63,7 @@ namespaces=$(kubectl get namespaces)
 # Automatically create the namespace if it doesn't exist
 echo "Checking if $NAMESPACE namespace exists..."
 if ! echo "$namespaces" | grep -q $NAMESPACE; then
-  kubectl create ns $NAMESPACE
+  kubectl apply -f ../k8s/helium-ns.yaml
 fi
 
 hostport_namespace="dynamic-hostports"
@@ -78,32 +78,20 @@ fi
 prometheus_namespace="kube-prometheus-stack"
 echo "Checking if $prometheus_namespace exists..."
 if ! echo "$namespaces" | grep -q "$prometheus_namespace"; then
-  ./scripts/dashboard/setup
+  ./dashboard/setup
 fi
 
-# Replace our <VALIDATOR_SETUP_SCRIPT> variable w/ contents of validator-setup.sh
 validator_tpl=../k8s/validator.yml
 validator_yml=../k8s/deploy.yml # tmp file
-setup_script=../k8s/validator-setup.sh
-setup_script_tmp=../k8s/tmp.sh
 
-target="<VALIDATOR_SETUP_SCRIPT>"
-
-# TODO make sure every line ends with a semicolon
-# Delete any comments and newlines
-grep -o '^[^#]*' $setup_script > $setup_script_tmp
-
-# Add tab spacing to the bash script to match yml
-repl=$(while IFS= read -r line; do echo -e "              $line"; done < $setup_script_tmp)
-
-echo "Inserting validator-setup.sh into validator.yml"
-while IFS= read -r line; do
-  echo "${line//$target/$repl}"
-done < $validator_tpl > $validator_yml
+cp $validator_tpl $validator_yml
 
 # Replace TOTAL_VALIDATORS with value from our selected environment variable
 # Awkward replace command to make WSL & Mac compatible
 { rm "$validator_yml" && awk '{gsub("<TOTAL_VALIDATORS>", "'$total_validators'", $0); print}' > "$validator_yml"; } < "$validator_yml"
+
+## Replace VALIDATOR_ENABLE_AUTO_UPDATE with value from local .env
+{ rm "$validator_yml" && awk '{gsub("<VALIDATOR_ENABLE_AUTO_UPDATE>", "'$ENABLE_AUTO_UPDATE'", $0); print}' > "$validator_yml"; } < "$validator_yml"
 
 # Use testnet validator image
 if [ -n "$TESTNET" ]; then
@@ -112,11 +100,12 @@ if [ -n "$TESTNET" ]; then
 fi
 
 # Apply the new configurations
+kubectl apply -f ../k8s/configmap.yaml -n $NAMESPACE
 kubectl apply -f $validator_yml -n $NAMESPACE
 kubectl apply -f ../k8s/exporter-service.yml -n $NAMESPACE
 
 # Cleanup temp files
-rm $validator_yml $setup_script_tmp
+rm $validator_yml
 
 if [[ $CMD == "restart" ]]; then
   ./restart pod
