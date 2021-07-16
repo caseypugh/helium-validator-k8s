@@ -21,6 +21,7 @@ Development is still early and pull requests are welcome! ✌️
 - [Monitoring](#monitoring)
   - [Accessing Grafana](#accessing-grafana)
   - [Validator dashboard & alerting](#validator-dashboard--alerting)
+  - [Remote Grafana access](#remote-grafana-access)
   - [Kubernetes dashboard (optional)](#kubernetes-dashboard-optional)
 - [Misc](#misc)
   - [FAQ](#faq)
@@ -228,6 +229,25 @@ Also, if you have improvements you'd like to make to the validator dashboard, pl
 ```sh
 scripts/dashboard/download
 # This will automatically download the Helium Validator Dashboard to k8s/grafana/grafana-validator-dashboard.yml
+```
+
+## Remote Grafana access
+If you're looking to give others access to a Grafana dashboard (or just want to be able to access from anywhere) you can use [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) to map a domain/subdomain to the Grafana pod. 
+
+First, you'll need to [find your DNS provider](https://github.com/kubernetes-sigs/external-dns#running-externaldns) in this list. You can follow their instructions provided, but the process should look something like this:
+
+First, edit these two YAML files: [k8s/grafana/external-dns-values.yml](/k8s/grafana/external-dns-service.yml) and [k8s/grafana/external-dns-service.yml](/k8s/grafana/external-dns-service.yml) and replace all the values with your own. Then run:
+
+```sh
+helm repo add bitnami https://charts.bitnami.com/bitnami
+
+# Run the following to install the DNS resolver 
+helm upgrade grafana-dns -f k8s/grafana/external-dns-values.yml bitnami/external-dns --install -n kube-prometheus-stack
+
+# Now you'll create a LoadBalancer service that will map an external IP to a domain (or subomdain)
+kubectl apply -f k8s/grafana/external-dns-service.yml -n kube-prometheus-stack
+
+# After a few moments, external-dns should see the new LoadBalancer service and automatically update your DNS TXT records
 ```
 
 ## Kubernetes dashboard (optional)

@@ -59,8 +59,8 @@ if [ -z "$CMD" ]; then
 
 elif [[ "$CMD" == "uninstall" ]]; then
 
-  kubectl delete -n "$NAMESPACE" -f "$k8s_folder/grafana-helium-api-datasource.yml"
-  kubectl delete -n "$NAMESPACE" -f "$k8s_folder/grafana-validator-dashboard.yml"
+  kubectl delete -n "$NAMESPACE" -f "$k8s_folder/helium-api-datasource.yml"
+  kubectl delete -n "$NAMESPACE" -f "$k8s_folder/validator-dashboard.yml"
 
   helm uninstall "$STACK" "$CHART" --namespace "$NAMESPACE"
 fi
