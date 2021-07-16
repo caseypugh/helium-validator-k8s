@@ -1,0 +1,10 @@
+extraEnv:
+- name: OAUTH_TOKEN
+  value: "your_token_here"
+source:
+- service
+- ingress
+domainFilters:
+- youdomain.com 
+provider: yourprovider
+registry: txt
