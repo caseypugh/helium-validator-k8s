@@ -107,6 +107,8 @@ validator-1   2/2     Running   0          5m
 
 Validators will automatically update themselves whenever a new version is released. If a validator is currently in consensus, it will not update until it is out of consensus.
 
+To disable auto updates, set the `ENABLE_AUTO_UPDATE` env var in your `.env` file to `false`
+
 ## Modify disk space
 By default, every validator will have 20GB of space each. If the validators start to need more space, you will have to modify each of your PVCs:
 ```sh
@@ -234,7 +236,7 @@ If you're looking to give others access to a Grafana dashboard (or just want to 
 
 First, you'll need to [find your DNS provider](https://github.com/kubernetes-sigs/external-dns#running-externaldns) in this list. You can follow their instructions provided, but the process should look something like this:
 
-First, edit these two YAML files: [k8s/grafana/external-dns-values.yml](/k8s/grafana/external-dns-service.yml) and [k8s/grafana/external-dns-service.yml](/k8s/grafana/external-dns-service.yml) and replace all the values with your own. Then run:
+First, edit these two YAML files: [k8s/grafana/external-dns-values.yml](/k8s/grafana/external-dns-values.yml) and [k8s/grafana/external-dns-service.yml](/k8s/grafana/external-dns-service.yml) and replace all the values with your own. Then run:
 
 ```sh
 helm repo add bitnami https://charts.bitnami.com/bitnami

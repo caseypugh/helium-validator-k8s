@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Validator helper utility 
 # info|peers|cg_perf|bash|logs|reset_db|kickstart

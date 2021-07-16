@@ -33,7 +33,9 @@ spec:
           livenessProbe:
             tcpSocket:
               port: 9825
-            initialDelaySeconds: 5
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 24 # kill the node after **2 mins** of unresponsiveness; default=3
           env:
             - name: NODE_NAME
               valueFrom:
@@ -67,7 +69,7 @@ spec:
             failureThreshold: 12 # try for 1 minute before giving up
           command: [ "/bin/ash", "-c" ]
           args:
-            - <VALIDATOR_SETUP_SCRIPT>
+            - "/opt/miner/usr/validator-setup.sh"
           env:
             - name: NAT_INTERNAL_PORT
               value: "2154"
@@ -83,6 +85,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
+            - name: VALIDATOR_ENABLE_AUTO_UPDATE
+              value: "<VALIDATOR_ENABLE_AUTO_UPDATE>"
           ports:
             - containerPort: 2154
             - containerPort: 4467
@@ -91,6 +95,9 @@ spec:
               mountPath: /var/data
             - name: podinfo
               mountPath: /etc/podinfo
+            - mountPath: /opt/miner/usr/validator-setup.sh
+              subPath: validator-setup.sh
+              name: config
 
       volumes:
         - name: podinfo
@@ -99,6 +106,10 @@ spec:
               - path: "annotations"
                 fieldRef:
                   fieldPath: metadata.annotations
+        - name: config
+          configMap:
+            name: validator
+            defaultMode: 0744
 
   volumeClaimTemplates:
     - metadata:
