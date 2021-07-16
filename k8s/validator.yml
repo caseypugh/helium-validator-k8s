@@ -33,7 +33,9 @@ spec:
           livenessProbe:
             tcpSocket:
               port: 9825
-            initialDelaySeconds: 120
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 24 # kill the node after **2 mins** of unresponsiveness; default=3
           env:
             - name: NODE_NAME
               valueFrom:
@@ -62,7 +64,7 @@ spec:
               command:
               - cat
               - /tmp/miner-started
-            initialDelaySeconds: 10 # probe right away. default=0
+            initialDelaySeconds: 0 # probe right away. default=0
             periodSeconds: 5 # give validator **2 minutes** to start up before we kill and try again
             failureThreshold: 12 # try for 1 minute before giving up
           command: [ "/bin/ash", "-c" ]

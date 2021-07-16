@@ -63,7 +63,7 @@ namespaces=$(kubectl get namespaces)
 # Automatically create the namespace if it doesn't exist
 echo "Checking if $NAMESPACE namespace exists..."
 if ! echo "$namespaces" | grep -q $NAMESPACE; then
-  kubectl apply -f ../k8s/helium-ns.yaml
+  kubectl apply -f ../k8s/helium-ns.yml
 fi
 
 hostport_namespace="dynamic-hostports"
@@ -100,7 +100,7 @@ if [ -n "$TESTNET" ]; then
 fi
 
 # Apply the new configurations
-kubectl apply -f ../k8s/configmap.yaml -n $NAMESPACE
+kubectl apply -f ../k8s/helium-validators-configmap.yml -n $NAMESPACE
 kubectl apply -f $validator_yml -n $NAMESPACE
 kubectl apply -f ../k8s/exporter-service.yml -n $NAMESPACE
 
