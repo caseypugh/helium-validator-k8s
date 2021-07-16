@@ -110,7 +110,7 @@ elif [[ $CMD == "replace" ]]; then
     kubectl cp "$swarm_key_file_path" "$pod:/var/data/miner/swarm_key" -c validator -n $NAMESPACE
 
     echo "Restarting $pod..."
-    ./deploy restart "$replica_id"
+    ./restart pod "$replica_id"
 
     rm tmp_swarm_key 2> /dev/null
   fi

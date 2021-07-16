@@ -108,7 +108,7 @@ kubectl apply -f ../k8s/exporter-service.yml -n $NAMESPACE
 rm $validator_yml
 
 if [[ $CMD == "restart" ]]; then
-  ./restart pod
+  ./restart pod 
 fi
 
 echo -e $(label "Finished!" $GREEN)
