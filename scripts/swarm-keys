@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 cwd=$(dirname "$0"); cd $cwd;
+source helper
 source ../.env
 
 CMD=$1
