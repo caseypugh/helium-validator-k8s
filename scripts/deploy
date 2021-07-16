@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Use "scripts/deploy restart" to both deploy new config and restart pods
 # Otherwise you'll want to delete and recreate the pods manually
@@ -55,14 +55,19 @@ fi
 
 # Install dynamic-hostports
 hostports_exists=$(kubectl get pods --all-namespaces | grep dynamic-hostports)
-if [ -z "$hostports_exists" ]; then
+if [ -z "${hostports_exists+x}" ]; then
   kubectl apply -f https://raw.githubusercontent.com/0blu/dynamic-hostports-k8s/master/deploy.yaml
+else 
+  echo "hostports release already exists"
 fi
 
 # Install kube-prometheus-stack
 prom_exists=$(kubectl get pods --all-namespaces | grep kube-prometheus-stack)
-if [ -z "$prom_exists" ]; then
+if [ -z "${prom_exists+x}" ]; then
+  echo "installing kube-prometheus-stack"
   ./dashboard/install
+else 
+  echo "kube-prometheus-stack already exists"
 fi
 
 # Replace our <VALIDATOR_SETUP_SCRIPT> variable w/ contents of validator-setup.sh

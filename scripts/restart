@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 cd $(dirname $0)
 source helper
 source ../.env

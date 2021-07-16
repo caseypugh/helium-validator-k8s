@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # DEPRECATED
 # Helper script to assist troubleshooting failing DigitalOcean droplets 
