@@ -17,3 +17,5 @@ grafana:
         allowUiUpdates: true
     datasources:
       enabled: true
+  ingress:
+    enabled: false
