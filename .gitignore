@@ -1,4 +1,4 @@
-.env
+.env*
 .kube/config
 cg_perf/*.csv
 cg_perf/data*
