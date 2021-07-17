@@ -58,7 +58,7 @@ data:
     done &
 
     # Version check every 15 minutes
-    while [[ $VALIDATOR_ENABLE_AUTO_UPDATE == "true" ]]; do
+    while [[ $VALIDATOR_VERSION == "latest" ]]; do
       # Install jq to make our lives easier
       if [ -z "$(which jq)" ]; then
         echo "[Version] Installing jq dependency";
@@ -111,7 +111,7 @@ data:
           kill "$tail_process";
           exit 1;
         fi;
-        sleep 900;
+        sleep 1800;
       fi;
     done &
 

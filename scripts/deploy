@@ -45,17 +45,21 @@ fi
 
 current_context=$(kubectl config current-context)
 total_validators=1
+validator_version=latest
 TESTNET=
 if [[ "$current_context" == "$MAINNET_CLUSTER" ]]; then
   total_validators=$TOTAL_MAINNET_VALIDATORS
+  validator_version=$VALIDATOR_MAINNET_VERSION
 elif [[ "$current_context" == "$TESTNET_CLUSTER" ]]; then
   total_validators=$TOTAL_TESTNET_VALIDATORS
+  validator_version=$VALIDATOR_TESTNET_VERSION
   TESTNET=1
 else
   echo "Warning, no TOTAL_*_VALIDATORS configured; defaulting to $total_validators"
   echo "Check that your .env file has all the keys from .env.sample"
 fi
 echo -e "Total validators: $(label $total_validators $GREEN)"
+echo -e "Validator version: $(label $validator_version $GREEN)"
 echo
 
 namespaces=$(kubectl get namespaces)
@@ -90,14 +94,27 @@ cp $validator_tpl $validator_yml
 # Awkward replace command to make WSL & Mac compatible
 { rm "$validator_yml" && awk '{gsub("<TOTAL_VALIDATORS>", "'$total_validators'", $0); print}' > "$validator_yml"; } < "$validator_yml"
 
-## Replace VALIDATOR_ENABLE_AUTO_UPDATE with value from local .env
-{ rm "$validator_yml" && awk '{gsub("<VALIDATOR_ENABLE_AUTO_UPDATE>", "'$ENABLE_AUTO_UPDATE'", $0); print}' > "$validator_yml"; } < "$validator_yml"
+## Replace VALIDATOR_VERSION with value from local .env
+{ rm "$validator_yml" && awk '{gsub("<VALIDATOR_VERSION>", "'$validator_version'", $0); print}' > "$validator_yml"; } < "$validator_yml"
 
-# Use testnet validator image
+# Determine which validator image to use
+VALIDATOR_IMG="latest-validator-amd64" # default
 if [ -n "$TESTNET" ]; then
-  TESTNET_IMG=latest-val-amd64
-  { rm "$validator_yml" && awk '{gsub("latest-validator-amd64", "'$TESTNET_IMG'", $0); print}' > "$validator_yml"; } < "$validator_yml"
+  if [[ "$validator_version" == "latest" ]]; then
+    VALIDATOR_IMG="latest-val-amd64"
+  else
+    VALIDATOR_IMG="miner-amd64_testnet_val${validator_version}"
+  fi
+else
+  if [[ "$validator_version" == "latest" ]]; then
+    VALIDATOR_IMG="latest-validator-amd64"
+  else
+    VALIDATOR_IMG="miner-amd64_validator${validator_version}"
+  fi
 fi
+
+echo -e "Setting validator image to: $(label "$VALIDATOR_IMG" $GREEN)"
+{ rm "$validator_yml" && awk '{gsub("latest-validator-amd64", "'$VALIDATOR_IMG'", $0); print}' > "$validator_yml"; } < "$validator_yml"
 
 # Apply the new configurations
 kubectl apply -f ../k8s/helium-validators-configmap.yml -n $NAMESPACE
