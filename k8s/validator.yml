@@ -85,8 +85,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
-            - name: VALIDATOR_ENABLE_AUTO_UPDATE
-              value: "<VALIDATOR_ENABLE_AUTO_UPDATE>"
+            - name: VALIDATOR_VERSION
+              value: "<VALIDATOR_VERSION>"
           ports:
             - containerPort: 2154
             - containerPort: 4467

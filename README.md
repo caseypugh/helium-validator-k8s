@@ -77,11 +77,19 @@ The main env vars you'll need to setup are:
 # Default namespace context as defined earlier
 NAMESPACE=helium
 
+# Default to latest or set a fixed version
+VALIDATOR_MAINNET_VERSION=latest
+
 # Number of validators you'd like to run
 TOTAL_MAINNET_VALIDATORS=2
 
 # To get the name of your cluster run `kubectl config current-context`
 MAINNET_CLUSTER=do-nyc1-helium-cluster
+
+# If you'd like to run a staging/testnet cluster, set the TESTNET env vars
+VALIDATOR_TESTNET_VERSION=latest
+TOTAL_TESTNET_VALIDATORS=1
+TESTNET_CLUSTER=do-nyc1-helium-cluster-dev
 ```
 
 The following script will automatically deploy everything you need to run and monitor your validators. 
@@ -93,6 +101,16 @@ scripts/deploy
 # - k8s/validator.yml
 # - dynamic-hostports
 # - kube-prometheus-stack (Prometheus & Grafana)
+```
+
+If you make changes to your validators in anyway you'll need to restart all of them by running:
+```sh
+scripts/deploy restart
+
+# or
+
+scripts/deploy
+scripts/restart pod
 ```
 
 You're all set! Try running `kubectl get pods` to see if everything is working. You should see something like:
@@ -107,7 +125,7 @@ validator-1   2/2     Running   0          5m
 
 Validators will automatically update themselves whenever a new version is released. If a validator is currently in consensus, it will not update until it is out of consensus.
 
-To disable auto updates, set the `ENABLE_AUTO_UPDATE` env var in your `.env` file to `false`
+To disable auto updates, set the `VALIDATOR_MAINNET_VERSION` env var in your `.env` file to the version you'd like (e.g. `1.0.11`) and then run `./scripts/deploy restart` to update all validators.
 
 ## Modify disk space
 By default, every validator will have 20GB of space each. If the validators start to need more space, you will have to modify each of your PVCs:
