@@ -54,6 +54,19 @@ elif [[ $CMD == "peers" ]]; then
     kubectl exec -it $pod -c validator -- sh -c "miner peer book -s"
   done
 
+elif [[ $CMD == "addrs" ]]; then
+  # FIXME DRY up with above, same
+  validator_count=$(kubectl get pods | grep -c "validator")
+  for ((i = 0; i < validator_count; i++)); do
+    pod="validator-$i"
+    echo; echo "Pod: $pod"
+    echo "'peer listen':"
+    kubectl exec -it $pod -c validator -- sh -c "miner peer listen --format=csv"
+    echo; echo "'peer addr':"
+    kubectl exec -it $pod -c validator -- sh -c "miner peer addr"
+  done
+
+  
 elif [[ $CMD == "cg_perf" ]]; then
   # pass additional arguments through, like "--format=csv"
   shift
@@ -86,6 +99,6 @@ elif [[ $CMD == "top" ]]; then
   kubectl top pods --all-namespaces
 
 else
-  echo "$0: unknown command \"$CMD\" - (info|peers|cg_perf|bash|logs|reset_db|kickstart)"
+  echo "$0: unknown command \"$CMD\" - (info|peers|cg_perf|bash|logs|reset_db|kickstart|top|addrs)"
   exit 1
 fi
