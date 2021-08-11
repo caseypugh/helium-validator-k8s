@@ -51,7 +51,7 @@ spec:
           resources:
             requests:
               cpu: 1
-              memory: "1.2Gi"
+              memory: "1.5Gi"
           livenessProbe:
             tcpSocket:
               port: 2154
