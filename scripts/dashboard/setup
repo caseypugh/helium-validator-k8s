@@ -31,9 +31,9 @@ fi
 
 if [[ "$CMD" == "update-dashboard" ]] || [ -z "$CMD" ]; then
   echo "Adding Helium API data source"
-  kubectl apply -n "$NAMESPACE" -f "$k8s_folder/grafana-helium-api-datasource.yml"
+  kubectl apply -n "$NAMESPACE" -f "$k8s_folder/helium-api-datasource.yml"
   echo "Adding Helium validator dashboard"
-  kubectl apply -n "$NAMESPACE" -f "$k8s_folder/grafana-validator-dashboard.yml"
+  kubectl apply -n "$NAMESPACE" -f "$k8s_folder/validator-dashboard.yml"
 fi
 
 if [ -z "$CMD" ]; then
