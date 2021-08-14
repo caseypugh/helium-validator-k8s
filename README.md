@@ -319,4 +319,4 @@ scripts/snapshot copy 0 2
 PRs for bug fixes, improvements, and new features are all welcome. And please feel free to file [GitHub issues](https://github.com/caseypugh/helium-validator-k8s/issues) for bugs / enhancements or to check out the loose roadmap.
 
 ## Thanks
-Huge thanks to the [DeWi team](https://dewialliance.medium.com/announcing-the-inaugural-dewi-grant-recipients-56b44b9b9b66) for helping fund this project. And special shoutout to [jamiew](https://twitter.com/jamiew)'s [validator-exporter-k8s](https://github.com/jamiew/validator-exporter-k8s) and [pootify](https://github.com/pootify).
+Huge thanks to the [DeWi team](https://dewialliance.medium.com/announcing-the-inaugural-dewi-grant-recipients-56b44b9b9b66) for helping fund this project. And special shoutout to [jamiew](https://twitter.com/jamiew)'s [validator-exporter-k8s](https://github.com/jamiew/validator-exporter-k8s) and [charlietran](https://github.com/charlietran).
