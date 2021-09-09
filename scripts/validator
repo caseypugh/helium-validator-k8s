@@ -98,7 +98,23 @@ elif [[ $CMD == "kickstart" ]]; then
 elif [[ $CMD == "top" ]]; then
   kubectl top pods --all-namespaces
 
+elif [[ $CMD == "pvc" ]]; then
+  pod_id=$2
+  disk_space=$3
+
+  if [ -z "$pod_id" ]; then
+    echo "$0: missing pod_id (aka pod replica number)"
+    exit 1
+  fi
+
+  if [ -z "$disk_space" ]; then
+    echo "$0: missing disk_space (e.g. 50Gi)"
+    exit 1
+  fi
+
+  kubectl patch pvc "validator-vol-validator-$pod_id" -n $NAMESPACE -p "{ \"spec\": { \"resources\": { \"requests\": { \"storage\": \"$disk_space\" }}}}"
+
 else
-  echo "$0: unknown command \"$CMD\" - (info|peers|cg_perf|bash|logs|reset_db|kickstart|top|addrs)"
+  echo "$0: unknown command \"$CMD\" - (info|peers|cg_perf|bash|logs|reset_db|kickstart|top|addrs|pvc)"
   exit 1
 fi

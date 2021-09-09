@@ -4,7 +4,7 @@
 
 This is a DigitalOcean-specific [Kubernetes (k8s)](https://kubernetes.io/) setup for running a cluster of [Helium validators](https://www.helium.com/stake). Some modifications are necessary to run on other Kubernetes hosts.
 
-Development is still early and pull requests are welcome! ✌️
+Development is still early and pull requests are welcome! ✌️ Also feel free to [join our Discord](https://discord.gg/EChYsrYKJz) to ask questions/get help.
 
 - [Local environment setup](#local-environment-setup)
   - [Extra tools](#extra-tools)
@@ -130,11 +130,10 @@ To disable auto updates, set the `VALIDATOR_MAINNET_VERSION` env var in your `.e
 ## Modify disk space
 By default, every validator will have 20GB of space each. If the validators start to need more space, you will have to modify each of your PVCs:
 ```sh
-# To get the name of your PVC(s)
-kubectl get pvc
+./scripts/validator pvc $replica_id $disk_size 
 
-# <new-size> = i.e. '40Gi'
-kubectl patch pvc <your-pvc-name> -p '{ "spec": { "resources": { "requests": { "storage": "<new-size>" }}}}'
+# Example
+./scripts/validator pvc 3 100Gi 
 ```
 
 
