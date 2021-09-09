@@ -12,3 +12,4 @@ assets/logo.psd
 snapshot.bin
 scripts/keys/*
 k8s/grafana/external-dns*
+*.bak
