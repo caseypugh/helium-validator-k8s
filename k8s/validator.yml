@@ -64,7 +64,7 @@ spec:
               command:
               - cat
               - /tmp/miner-started
-            initialDelaySeconds: 0 # probe right away. default=0
+            initialDelaySeconds: 2 # give validator container a smidge to start up. default=0
             periodSeconds: 5 # give validator **2 minutes** to start up before we kill and try again
             failureThreshold: 12 # try for 1 minute before giving up
           command: [ "/bin/ash", "-c" ]
