@@ -45,3 +45,12 @@ function grafana_api_post {
   data=$2
   curl -s --user admin:prom-operator -H "Content-Type: application/json" --data "$data" "http://localhost:$GRAFANA_PORT$path"
 }
+
+# https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
+function verlte() {
+  [  "$1" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
+}
+
+function verlt() {
+  [ "$1" = "$2" ] && return 1 || verlte $1 $2
+}

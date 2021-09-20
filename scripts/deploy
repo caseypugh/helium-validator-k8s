@@ -106,10 +106,14 @@ if [ -n "$TESTNET" ]; then
     VALIDATOR_IMG="miner-amd64_testnet_val${validator_version}"
   fi
 else
+  is_old_version=$(verlt $validator_version 1.3.0 && echo "old" || echo "new")
+
   if [[ "$validator_version" == "latest" ]]; then
     VALIDATOR_IMG="latest-validator-amd64"
-  else
+  elif [[ "$is_old_version" == "old" ]]; then
     VALIDATOR_IMG="miner-amd64_validator${validator_version}"
+  else
+    VALIDATOR_IMG="validator-amd64_${validator_version}"
   fi
 fi
 
