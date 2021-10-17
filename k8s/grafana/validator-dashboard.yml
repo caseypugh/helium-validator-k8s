@@ -23,8 +23,8 @@ data:
       "editable": true,
       "gnetId": null,
       "graphTooltip": 0,
-      "id": 84,
-      "iteration": 1626361131983,
+      "id": 97,
+      "iteration": 1634494783996,
       "links": [
         {
           "asDropdown": false,
@@ -1013,7 +1013,7 @@ data:
             ]
           },
           "gridPos": {
-            "h": 7,
+            "h": 8,
             "w": 12,
             "x": 12,
             "y": 2
@@ -1028,7 +1028,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "validator_version_info{validator_name=~\"$validators\"}",
+              "expr": "validator_version_info{validator_name=~\"$validators\",pod=~\"$pod\",node=~\"$node\"}",
               "format": "table",
               "instant": true,
               "interval": "",
@@ -1037,7 +1037,7 @@ data:
             },
             {
               "exemplar": true,
-              "expr": "sum(validator_height{validator_name=~\"$validators\"}) by (validator_name)",
+              "expr": "sum(validator_height{validator_name=~\"$validators\",pod=~\"$pod\",node=~\"$node\"}) by (validator_name)",
               "format": "table",
               "hide": false,
               "instant": true,
@@ -1047,7 +1047,7 @@ data:
             },
             {
               "exemplar": true,
-              "expr": "sum(validator_api_rewards{validator_name=~\"$validators\"}) by (validator_name, validator_addr)",
+              "expr": "sum(validator_api_rewards{validator_name=~\"$validators\",pod=~\"$pod\",node=~\"$node\"}) by (validator_name, validator_addr)",
               "format": "table",
               "hide": false,
               "instant": true,
@@ -1373,7 +1373,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 9
+            "y": 10
           },
           "id": 13,
           "panels": [],
@@ -1417,9 +1417,6 @@ data:
             "notifications": [
               {
                 "uid": "zKC62eRnk"
-              },
-              {
-                "uid": "BAsH7oi7z"
               }
             ]
           },
@@ -1516,7 +1513,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 10
+            "y": 11
           },
           "id": 47,
           "options": {
@@ -1658,7 +1655,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 10
+            "y": 11
           },
           "id": 59,
           "options": {
@@ -1791,7 +1788,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 18
+            "y": 19
           },
           "id": 51,
           "options": {
@@ -1928,7 +1925,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 18
+            "y": 19
           },
           "id": 49,
           "options": {
@@ -2011,7 +2008,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 26
+            "y": 27
           },
           "id": 105,
           "options": {
@@ -2027,7 +2024,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(validator_connections{pod=~\"$pod\"}) by (pod)",
+              "expr": "sum(validator_connections{pod=~\"$pod\",node=~\"$node\"}) by (pod)",
               "hide": false,
               "interval": "",
               "legendFormat": "{{pod}}",
@@ -2094,7 +2091,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 26
+            "y": 27
           },
           "id": 106,
           "options": {
@@ -2110,7 +2107,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(validator_sessions{pod=~\"$pod\"}) by (pod)",
+              "expr": "sum(validator_sessions{pod=~\"$pod\",node=~\"$node\"}) by (pod)",
               "interval": "",
               "legendFormat": "{{pod}} ",
               "refId": "A"
@@ -2126,7 +2123,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 34
+            "y": 35
           },
           "id": 92,
           "panels": [
@@ -2511,7 +2508,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 35
+            "y": 36
           },
           "id": 108,
           "panels": [],
@@ -2576,7 +2573,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 36
+            "y": 37
           },
           "id": 1,
           "links": [],
@@ -2594,7 +2591,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"helium\", pod=~\"$pod\"}) by (pod)\n",
+              "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"helium\", pod=~\"$pod\",node=~\"$node\"}) by (pod)\n",
               "format": "time_series",
               "interval": "1m",
               "intervalFactor": 2,
@@ -2708,7 +2705,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 36
+            "y": 37
           },
           "id": 42,
           "links": [],
@@ -2808,7 +2805,7 @@ data:
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 44
+            "y": 45
           },
           "id": 2,
           "links": [],
@@ -2826,7 +2823,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(\n    container_memory_working_set_bytes{namespace=\"helium\", container!=\"\", image!=\"\", pod=~\"$pod\"}\n * on(namespace,pod)\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"helium\", pod=~\"$pod\"}\n) by (pod)\n",
+              "expr": "sum(\n    container_memory_working_set_bytes{namespace=\"helium\", container!=\"\", image!=\"\", pod=~\"$pod\", node=~\"$node\"}\n * on(namespace,pod)\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"helium\", pod=~\"$pod\"}\n) by (pod)\n",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -2899,7 +2896,7 @@ data:
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 44
+            "y": 45
           },
           "hiddenSeries": false,
           "id": 43,
@@ -2995,601 +2992,600 @@ data:
           }
         },
         {
-          "collapsed": true,
+          "collapsed": false,
           "datasource": null,
           "gridPos": {
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 51
+            "y": 52
           },
           "id": 90,
-          "panels": [
-            {
-              "alert": {
-                "alertRuleTags": {},
-                "conditions": [
-                  {
-                    "evaluator": {
-                      "params": [
-                        5368709120
-                      ],
-                      "type": "lt"
-                    },
-                    "operator": {
-                      "type": "and"
-                    },
-                    "query": {
-                      "params": [
-                        "A",
-                        "5m",
-                        "now"
-                      ]
-                    },
-                    "reducer": {
-                      "params": [],
-                      "type": "avg"
-                    },
-                    "type": "query"
-                  }
-                ],
-                "executionErrorState": "alerting",
-                "for": "5m",
-                "frequency": "1m",
-                "handler": 1,
-                "name": "Low disk space alert",
-                "noDataState": "alerting",
-                "notifications": [
-                  {
-                    "uid": "zKC62eRnk"
-                  }
-                ]
-              },
-              "aliasColors": {},
-              "bars": false,
-              "dashLength": 10,
-              "dashes": false,
-              "datasource": null,
-              "description": "",
-              "fieldConfig": {
-                "defaults": {
-                  "unit": "decbytes"
-                },
-                "overrides": []
-              },
-              "fill": 0,
-              "fillGradient": 0,
-              "gridPos": {
-                "h": 8,
-                "w": 24,
-                "x": 0,
-                "y": 52
-              },
-              "hiddenSeries": false,
-              "id": 53,
-              "legend": {
-                "avg": false,
-                "current": false,
-                "max": false,
-                "min": false,
-                "show": true,
-                "total": false,
-                "values": false
-              },
-              "lines": true,
-              "linewidth": 1,
-              "nullPointMode": "null",
-              "options": {
-                "alertThreshold": true
-              },
-              "percentage": false,
-              "pluginVersion": "8.0.3",
-              "pointradius": 2,
-              "points": false,
-              "renderer": "flot",
-              "seriesOverrides": [],
-              "spaceLength": 10,
-              "stack": false,
-              "steppedLine": false,
-              "targets": [
-                {
-                  "exemplar": true,
-                  "expr": "sum without(instance, node) (topk(1, (kubelet_volume_stats_available_bytes{job=\"kubelet\", metrics_path=\"/metrics\", namespace=\"helium\"}))  by (persistentvolumeclaim))\n",
-                  "interval": "",
-                  "legendFormat": "{{persistentvolumeclaim}}",
-                  "refId": "A"
-                }
-              ],
-              "thresholds": [
-                {
-                  "colorMode": "critical",
-                  "fill": true,
-                  "line": true,
-                  "op": "lt",
-                  "value": 5368709120,
-                  "visible": true
-                }
-              ],
-              "timeFrom": null,
-              "timeRegions": [],
-              "timeShift": null,
-              "title": "Free Disk Space (by validator)",
-              "tooltip": {
-                "shared": true,
-                "sort": 0,
-                "value_type": "individual"
-              },
-              "type": "graph",
-              "xaxis": {
-                "buckets": null,
-                "mode": "time",
-                "name": null,
-                "show": true,
-                "values": []
-              },
-              "yaxes": [
-                {
-                  "$$hashKey": "object:440",
-                  "format": "decbytes",
-                  "label": null,
-                  "logBase": 1,
-                  "max": null,
-                  "min": "0",
-                  "show": true
-                },
-                {
-                  "$$hashKey": "object:441",
-                  "format": "short",
-                  "label": null,
-                  "logBase": 1,
-                  "max": null,
-                  "min": null,
-                  "show": true
-                }
-              ],
-              "yaxis": {
-                "align": false,
-                "alignLevel": null
-              }
-            },
-            {
-              "aliasColors": {},
-              "bars": false,
-              "dashLength": 10,
-              "dashes": false,
-              "datasource": null,
-              "fill": 0,
-              "fillGradient": 0,
-              "gridPos": {
-                "h": 9,
-                "w": 12,
-                "x": 0,
-                "y": 60
-              },
-              "hiddenSeries": false,
-              "id": 94,
-              "legend": {
-                "alignAsTable": false,
-                "avg": false,
-                "current": false,
-                "max": false,
-                "min": false,
-                "rightSide": false,
-                "show": true,
-                "sideWidth": null,
-                "total": false,
-                "values": false
-              },
-              "lines": true,
-              "linewidth": 1,
-              "links": [],
-              "nullPointMode": "null",
-              "options": {
-                "alertThreshold": true
-              },
-              "percentage": false,
-              "pluginVersion": "8.0.3",
-              "pointradius": 5,
-              "points": false,
-              "renderer": "flot",
-              "repeat": null,
-              "seriesOverrides": [],
-              "spaceLength": 10,
-              "stack": false,
-              "steppedLine": false,
-              "targets": [
-                {
-                  "exemplar": true,
-                  "expr": "sum(rate(container_fs_reads_bytes_total{container=\"validator\", pod=~\"$pod\"}[5m])) by (pod)",
-                  "format": "time_series",
-                  "hide": false,
-                  "interval": "",
-                  "intervalFactor": 2,
-                  "legendFormat": "{{pod}}/reads",
-                  "refId": "A"
-                },
-                {
-                  "exemplar": true,
-                  "expr": "sum(rate(container_fs_writes_bytes_total{container=\"validator\", pod=~\"$pod\"}[5m])) by (pod)",
-                  "hide": false,
-                  "interval": "",
-                  "legendFormat": "{{pod}}/writes",
-                  "refId": "B"
-                }
-              ],
-              "thresholds": [],
-              "timeFrom": null,
-              "timeRegions": [],
-              "timeShift": null,
-              "title": "Disk I/O (by validator)",
-              "tooltip": {
-                "shared": true,
-                "sort": 0,
-                "value_type": "individual"
-              },
-              "type": "graph",
-              "xaxis": {
-                "buckets": null,
-                "mode": "time",
-                "name": null,
-                "show": true,
-                "values": []
-              },
-              "yaxes": [
-                {
-                  "$$hashKey": "object:56",
-                  "format": "bytes",
-                  "label": null,
-                  "logBase": 1,
-                  "max": null,
-                  "min": null,
-                  "show": true
-                },
-                {
-                  "$$hashKey": "object:57",
-                  "format": "s",
-                  "label": null,
-                  "logBase": 1,
-                  "max": null,
-                  "min": null,
-                  "show": true
-                }
-              ],
-              "yaxis": {
-                "align": false,
-                "alignLevel": null
-              }
-            },
-            {
-              "aliasColors": {},
-              "bars": false,
-              "dashLength": 10,
-              "dashes": false,
-              "datasource": null,
-              "fill": 0,
-              "fillGradient": 0,
-              "gridPos": {
-                "h": 9,
-                "w": 12,
-                "x": 12,
-                "y": 60
-              },
-              "hiddenSeries": false,
-              "id": 96,
-              "legend": {
-                "alignAsTable": false,
-                "avg": false,
-                "current": false,
-                "max": false,
-                "min": false,
-                "rightSide": false,
-                "show": true,
-                "sideWidth": null,
-                "total": false,
-                "values": false
-              },
-              "lines": true,
-              "linewidth": 1,
-              "links": [],
-              "nullPointMode": "null",
-              "options": {
-                "alertThreshold": true
-              },
-              "percentage": false,
-              "pluginVersion": "8.0.3",
-              "pointradius": 5,
-              "points": false,
-              "renderer": "flot",
-              "seriesOverrides": [],
-              "spaceLength": 10,
-              "stack": false,
-              "steppedLine": false,
-              "targets": [
-                {
-                  "exemplar": true,
-                  "expr": "sum(rate(container_fs_reads_bytes_total{pod=~\"$pod\"}[5m])) by (node)",
-                  "format": "time_series",
-                  "hide": false,
-                  "interval": "",
-                  "intervalFactor": 2,
-                  "legendFormat": "{{node}}/reads",
-                  "refId": "A"
-                },
-                {
-                  "exemplar": true,
-                  "expr": "sum(rate(container_fs_writes_bytes_total{pod=~\"$pod\"}[5m])) by (node)",
-                  "hide": false,
-                  "interval": "",
-                  "legendFormat": "{{node}}/writes",
-                  "refId": "B"
-                }
-              ],
-              "thresholds": [],
-              "timeFrom": null,
-              "timeRegions": [],
-              "timeShift": null,
-              "title": "Disk I/O (by node)",
-              "tooltip": {
-                "shared": true,
-                "sort": 0,
-                "value_type": "individual"
-              },
-              "type": "graph",
-              "xaxis": {
-                "buckets": null,
-                "mode": "time",
-                "name": null,
-                "show": true,
-                "values": []
-              },
-              "yaxes": [
-                {
-                  "$$hashKey": "object:56",
-                  "format": "bytes",
-                  "label": null,
-                  "logBase": 1,
-                  "max": null,
-                  "min": null,
-                  "show": true
-                },
-                {
-                  "$$hashKey": "object:57",
-                  "format": "s",
-                  "label": null,
-                  "logBase": 1,
-                  "max": null,
-                  "min": null,
-                  "show": true
-                }
-              ],
-              "yaxis": {
-                "align": false,
-                "alignLevel": null
-              }
-            },
-            {
-              "aliasColors": {},
-              "bars": false,
-              "dashLength": 10,
-              "dashes": false,
-              "datasource": null,
-              "description": "",
-              "fill": 0,
-              "fillGradient": 0,
-              "gridPos": {
-                "h": 9,
-                "w": 12,
-                "x": 0,
-                "y": 69
-              },
-              "hiddenSeries": false,
-              "id": 63,
-              "legend": {
-                "avg": false,
-                "current": false,
-                "max": false,
-                "min": false,
-                "show": true,
-                "total": false,
-                "values": false
-              },
-              "lines": true,
-              "linewidth": 1,
-              "links": [],
-              "nullPointMode": "null as zero",
-              "options": {
-                "alertThreshold": true
-              },
-              "percentage": false,
-              "pluginVersion": "8.0.3",
-              "pointradius": 5,
-              "points": false,
-              "renderer": "flot",
-              "seriesOverrides": [
-                {
-                  "$$hashKey": "object:1729",
-                  "alias": "memtotal",
-                  "dashes": true,
-                  "legend": false
-                }
-              ],
-              "spaceLength": 10,
-              "stack": false,
-              "steppedLine": false,
-              "targets": [
-                {
-                  "exemplar": true,
-                  "expr": "sum(process_open_fds{namespace=\"helium\",pod=~\"$pod\"}) by (pod)",
-                  "format": "time_series",
-                  "interval": "",
-                  "intervalFactor": 2,
-                  "legendFormat": "{{node}}",
-                  "legendLink": null,
-                  "refId": "A",
-                  "step": 10
-                }
-              ],
-              "thresholds": [],
-              "timeFrom": null,
-              "timeRegions": [],
-              "timeShift": null,
-              "title": "Open file descriptors (by validator)",
-              "tooltip": {
-                "shared": true,
-                "sort": 0,
-                "value_type": "individual"
-              },
-              "transformations": [],
-              "type": "graph",
-              "xaxis": {
-                "buckets": null,
-                "mode": "time",
-                "name": null,
-                "show": true,
-                "values": []
-              },
-              "yaxes": [
-                {
-                  "$$hashKey": "object:1876",
-                  "format": "none",
-                  "label": null,
-                  "logBase": 1,
-                  "max": null,
-                  "min": 0,
-                  "show": true
-                },
-                {
-                  "$$hashKey": "object:1877",
-                  "format": "short",
-                  "label": null,
-                  "logBase": 1,
-                  "max": null,
-                  "min": null,
-                  "show": false
-                }
-              ],
-              "yaxis": {
-                "align": false,
-                "alignLevel": null
-              }
-            },
-            {
-              "aliasColors": {},
-              "bars": false,
-              "dashLength": 10,
-              "dashes": false,
-              "datasource": null,
-              "description": "",
-              "fill": 0,
-              "fillGradient": 0,
-              "gridPos": {
-                "h": 9,
-                "w": 12,
-                "x": 12,
-                "y": 69
-              },
-              "hiddenSeries": false,
-              "id": 62,
-              "legend": {
-                "avg": false,
-                "current": false,
-                "max": false,
-                "min": false,
-                "show": true,
-                "total": false,
-                "values": false
-              },
-              "lines": true,
-              "linewidth": 1,
-              "links": [],
-              "nullPointMode": "null as zero",
-              "options": {
-                "alertThreshold": true
-              },
-              "percentage": false,
-              "pluginVersion": "8.0.3",
-              "pointradius": 5,
-              "points": false,
-              "renderer": "flot",
-              "seriesOverrides": [
-                {
-                  "$$hashKey": "object:1729",
-                  "alias": "memtotal",
-                  "dashes": true,
-                  "legend": false
-                }
-              ],
-              "spaceLength": 10,
-              "stack": false,
-              "steppedLine": false,
-              "targets": [
-                {
-                  "exemplar": true,
-                  "expr": "sum(process_open_fds{node!~\"\"}) by (node)\n",
-                  "format": "time_series",
-                  "interval": "",
-                  "intervalFactor": 2,
-                  "legendFormat": "{{node}}",
-                  "legendLink": null,
-                  "refId": "A",
-                  "step": 10
-                },
-                {
-                  "exemplar": true,
-                  "expr": "sum(node_procs_blocked{node!~\"\"}) by (node)\n",
-                  "hide": false,
-                  "interval": "",
-                  "legendFormat": "",
-                  "refId": "C"
-                }
-              ],
-              "thresholds": [],
-              "timeFrom": null,
-              "timeRegions": [],
-              "timeShift": null,
-              "title": "Open file descriptors (by node)",
-              "tooltip": {
-                "shared": true,
-                "sort": 0,
-                "value_type": "individual"
-              },
-              "transformations": [],
-              "type": "graph",
-              "xaxis": {
-                "buckets": null,
-                "mode": "time",
-                "name": null,
-                "show": true,
-                "values": []
-              },
-              "yaxes": [
-                {
-                  "$$hashKey": "object:1876",
-                  "format": "none",
-                  "label": null,
-                  "logBase": 1,
-                  "max": null,
-                  "min": 0,
-                  "show": true
-                },
-                {
-                  "$$hashKey": "object:1877",
-                  "format": "short",
-                  "label": null,
-                  "logBase": 1,
-                  "max": null,
-                  "min": null,
-                  "show": false
-                }
-              ],
-              "yaxis": {
-                "align": false,
-                "alignLevel": null
-              }
-            }
-          ],
+          "panels": [],
           "title": "Disk",
           "type": "row"
+        },
+        {
+          "alert": {
+            "alertRuleTags": {},
+            "conditions": [
+              {
+                "evaluator": {
+                  "params": [
+                    5368709120
+                  ],
+                  "type": "lt"
+                },
+                "operator": {
+                  "type": "and"
+                },
+                "query": {
+                  "params": [
+                    "A",
+                    "5m",
+                    "now"
+                  ]
+                },
+                "reducer": {
+                  "params": [],
+                  "type": "avg"
+                },
+                "type": "query"
+              }
+            ],
+            "executionErrorState": "alerting",
+            "for": "5m",
+            "frequency": "1m",
+            "handler": 1,
+            "name": "Low disk space alert",
+            "noDataState": "alerting",
+            "notifications": [
+              {
+                "uid": "zKC62eRnk"
+              }
+            ]
+          },
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": null,
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "fill": 0,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 53
+          },
+          "hiddenSeries": false,
+          "id": 53,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.0.3",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "sum without(instance, node) (topk(1, (kubelet_volume_stats_available_bytes{job=\"kubelet\", metrics_path=\"/metrics\", namespace=\"helium\"}))  by (persistentvolumeclaim))\n",
+              "interval": "",
+              "legendFormat": "{{persistentvolumeclaim}}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [
+            {
+              "colorMode": "critical",
+              "fill": true,
+              "line": true,
+              "op": "lt",
+              "value": 5368709120,
+              "visible": true
+            }
+          ],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "Free Disk Space (by validator)",
+          "tooltip": {
+            "shared": true,
+            "sort": 1,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:440",
+              "format": "decbytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "$$hashKey": "object:441",
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": null,
+          "fill": 0,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 61
+          },
+          "hiddenSeries": false,
+          "id": 94,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.0.3",
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "sum(rate(container_fs_reads_bytes_total{container=\"validator\", pod=~\"$pod\",node=~\"$node\"}[5m])) by (pod)",
+              "format": "time_series",
+              "hide": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "{{pod}}/reads",
+              "refId": "A"
+            },
+            {
+              "exemplar": true,
+              "expr": "sum(rate(container_fs_writes_bytes_total{container=\"validator\", pod=~\"$pod\",node=~\"$node\"}[5m])) by (pod)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "{{pod}}/writes",
+              "refId": "B"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "Disk I/O (by validator)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:56",
+              "format": "bytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:57",
+              "format": "s",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": null,
+          "fill": 0,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 12,
+            "y": 61
+          },
+          "hiddenSeries": false,
+          "id": 96,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.0.3",
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "sum(rate(container_fs_reads_bytes_total{pod=~\"$pod\",node=~\"$node\"}[5m])) by (node)",
+              "format": "time_series",
+              "hide": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "{{node}}/reads",
+              "refId": "A"
+            },
+            {
+              "exemplar": true,
+              "expr": "sum(rate(container_fs_writes_bytes_total{pod=~\"$pod\",node=~\"$node\"}[5m])) by (node)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "{{node}}/writes",
+              "refId": "B"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "Disk I/O (by node)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:56",
+              "format": "bytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:57",
+              "format": "s",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": null,
+          "description": "",
+          "fill": 0,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 70
+          },
+          "hiddenSeries": false,
+          "id": 63,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null as zero",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.0.3",
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "$$hashKey": "object:1729",
+              "alias": "memtotal",
+              "dashes": true,
+              "legend": false
+            }
+          ],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "sum(process_open_fds{namespace=\"helium\",pod=~\"$pod\"}) by (pod)",
+              "format": "time_series",
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "{{node}}",
+              "legendLink": null,
+              "refId": "A",
+              "step": 10
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "Open file descriptors (by validator)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "transformations": [],
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:1876",
+              "format": "none",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": 0,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:1877",
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": false
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": null,
+          "description": "",
+          "fill": 0,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 12,
+            "y": 70
+          },
+          "hiddenSeries": false,
+          "id": 62,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null as zero",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.0.3",
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "$$hashKey": "object:1729",
+              "alias": "memtotal",
+              "dashes": true,
+              "legend": false
+            }
+          ],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "sum(process_open_fds{node=~\"$node\"}) by (node)\n",
+              "format": "time_series",
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "{{node}}",
+              "legendLink": null,
+              "refId": "A",
+              "step": 10
+            },
+            {
+              "exemplar": true,
+              "expr": "sum(node_procs_blocked{node=~\"$node\"}) by (node)\n",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "C"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "Open file descriptors (by node)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "transformations": [],
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:1876",
+              "format": "none",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": 0,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:1877",
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": false
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
         },
         {
           "collapsed": false,
@@ -3598,7 +3594,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 52
+            "y": 79
           },
           "id": 98,
           "panels": [],
@@ -3666,7 +3662,7 @@ data:
             "h": 9,
             "w": 12,
             "x": 0,
-            "y": 53
+            "y": 80
           },
           "id": 3,
           "links": [],
@@ -3684,7 +3680,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(irate(container_network_receive_bytes_total{namespace=~\"helium\",pod=~\"$pod\"}[$__rate_interval])) by (pod)",
+              "expr": "sum(irate(container_network_receive_bytes_total{namespace=~\"helium\",pod=~\"$pod\",node=~\"$node\"}[$__rate_interval])) by (pod)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -3758,7 +3754,7 @@ data:
             "h": 9,
             "w": 12,
             "x": 12,
-            "y": 53
+            "y": 80
           },
           "id": 64,
           "links": [],
@@ -3776,7 +3772,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(irate(container_network_receive_bytes_total{pod=~\"$pod\"}[$__rate_interval])) by (node)",
+              "expr": "sum(irate(container_network_receive_bytes_total{pod=~\"$pod\",node=~\"$node\"}[$__rate_interval])) by (node)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -3850,7 +3846,7 @@ data:
             "h": 9,
             "w": 12,
             "x": 0,
-            "y": 62
+            "y": 89
           },
           "id": 4,
           "links": [],
@@ -3868,7 +3864,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(irate(container_network_transmit_bytes_total{namespace=~\"helium\",pod=~\"$pod\"}[$__rate_interval])) by (pod)",
+              "expr": "sum(irate(container_network_transmit_bytes_total{namespace=~\"helium\",pod=~\"$pod\",node=~\"$node\"}[$__rate_interval])) by (pod)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -3942,7 +3938,7 @@ data:
             "h": 9,
             "w": 12,
             "x": 12,
-            "y": 62
+            "y": 89
           },
           "id": 65,
           "links": [],
@@ -3960,7 +3956,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(irate(container_network_transmit_bytes_total{pod=~\"$pod\"}[$__rate_interval])) by (node)",
+              "expr": "sum(irate(container_network_transmit_bytes_total{pod=~\"$pod\",node=~\"$node\"}[$__rate_interval])) by (node)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -3989,7 +3985,7 @@ data:
           {
             "allValue": null,
             "current": {
-              "selected": false,
+              "selected": true,
               "text": [
                 "All"
               ],
@@ -4020,7 +4016,7 @@ data:
           {
             "allValue": null,
             "current": {
-              "selected": false,
+              "selected": true,
               "text": [
                 "All"
               ],
@@ -4047,11 +4043,42 @@ data:
             "skipUrlSync": false,
             "sort": 1,
             "type": "query"
+          },
+          {
+            "allValue": null,
+            "current": {
+              "selected": true,
+              "text": [
+                "All"
+              ],
+              "value": [
+                "$__all"
+              ]
+            },
+            "datasource": null,
+            "definition": "label_values(validator_version_info{validator_name=~\"$validators\",pod=~\"$pod\"}, node) ",
+            "description": null,
+            "error": null,
+            "hide": 0,
+            "includeAll": true,
+            "label": "Node",
+            "multi": true,
+            "name": "node",
+            "options": [],
+            "query": {
+              "query": "label_values(validator_version_info{validator_name=~\"$validators\",pod=~\"$pod\"}, node) ",
+              "refId": "StandardVariableQuery"
+            },
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
           }
         ]
       },
       "time": {
-        "from": "now-3h",
+        "from": "now-24h",
         "to": "now"
       },
       "timepicker": {},
