@@ -37,13 +37,13 @@ function is_in_consensus {
 
 function grafana_api {
   path=$1
-  curl -s --user admin:prom-operator -H "Content-Type: application/json" "http://localhost:${GRAFANA_PORT}${path}"
+  curl -s --user "admin:${GRAFANA_ADMIN_PASSWORD}" -H "Content-Type: application/json" "http://localhost:${GRAFANA_PORT}${path}"
 }
 
 function grafana_api_post {
   path=$1
   data=$2
-  curl -s --user admin:prom-operator -H "Content-Type: application/json" --data "$data" "http://localhost:$GRAFANA_PORT$path"
+  curl -s --user "admin:${GRAFANA_ADMIN_PASSWORD}" -H "Content-Type: application/json" --data "$data" "http://localhost:${GRAFANA_PORT}${path}"
 }
 
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash

@@ -14,7 +14,6 @@ function load_panel {
   echo "$panel"
 }
 
-
 # Fetch the UID of our dashboard
 dash_name="Helium Validator Dashboard"
 response=$(grafana_api /api/search?query=$dash_name)
@@ -28,7 +27,7 @@ fi
 echo -e "Fetching latest $(label "$dash_name" $GREEN) ..."
 response=$(grafana_api /api/dashboards/uid/$dash_uid)
  
-dashboard_yml=$CONFIG_PATH/grafana-validator-dashboard.yml
+dashboard_yml=$CONFIG_PATH/validator-dashboard.yml
 dashboard=$(echo "$response" | jq -c --arg title "$dash_name" '.dashboard | .uid = null | .version = 1 | .title = $title')
 
 cat > $dashboard_yml <<- EOM
@@ -44,5 +43,5 @@ EOM
 
 echo "$dashboard" | jq '.' | sed 's/^/    /' >> $dashboard_yml
 
-echo -e "Dashboard downloaded to $(label "k8s/grafana/grafana-validator-dashboard.yml" $GREEN)"
+echo -e "Dashboard downloaded to $(label "k8s/grafana/validator-dashboard.yml" $GREEN)"
 echo
