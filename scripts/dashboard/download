@@ -14,9 +14,12 @@ function load_panel {
   echo "$panel"
 }
 
+# Check if you ran the tunnel before running this
+grafana_check_if_running && echo "Grafana running" || echo "Grafana not accessible; try running scripts/dashboard/monitor first"
+
 # Fetch the UID of our dashboard
 dash_name="Helium Validator Dashboard"
-response=$(grafana_api /api/search?query=$dash_name)
+response=$(grafana_api "/api/search?query=$dash_name")
 dash_uid=$(echo "$response" | jq -r -c --arg name "$dash_name" '[ .[] | select( .title | contains($name)) ][0].uid')
 
 if [[ $dash_uid == "null" ]] || [ -z "$dash_uid" ]; then
@@ -26,7 +29,7 @@ fi
 
 echo -e "Fetching latest $(label "$dash_name" $GREEN) ..."
 response=$(grafana_api /api/dashboards/uid/$dash_uid)
- 
+
 dashboard_yml=$CONFIG_PATH/validator-dashboard.yml
 dashboard=$(echo "$response" | jq -c --arg title "$dash_name" '.dashboard | .uid = null | .version = 1 | .title = $title')
 
