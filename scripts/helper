@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Misc kubectl+validator helper include 
+# Misc kubectl+validator helper include
 #
 
 POD_NAME=validator
@@ -33,6 +33,11 @@ function get_miner_address {
 function is_in_consensus {
   replica=$1
   kubectl exec -it $POD_NAME-$replica -c $CONTAINER_NAME -n $NAMESPACE -- /bin/sh -c "miner info in_consensus"
+}
+
+# is the scripts/dashboard/monitor tunnel running? returns true/false
+function grafana_check_if_running {
+  (curl -s "http://localhost:${GRAFANA_PORT}/login" | grep Grafana >/dev/null)
 }
 
 function grafana_api {
