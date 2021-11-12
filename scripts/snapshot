@@ -34,20 +34,29 @@ if [ -n "$replica_from" ]; then
   fi
 
   if [ -n "$download" ]; then
-    echo; echo "Exporting snapshot from $replica_from ..."
+    echo; echo "$replica_from: Exporting snapshot ..."
     kubectl exec -it "$replica_from" -c $CONTAINER -n $NAMESPACE -- sh -c "miner snapshot take /var/data/snapshot.bin"
 
-    echo "Downloading snapshot ..."
-    kubectl cp "$replica_from:/var/data/snapshot.bin" $snapshot_path -c $CONTAINER -n $NAMESPACE > /dev/null
+    echo "$replica_from: Downloading snapshot ..."
+    kubectl cp "$replica_from:/var/data/snapshot.bin" "$snapshot_path" -c $CONTAINER -n $NAMESPACE > /dev/null
   fi
 fi
 
 if [ -n "$replica_to" ]; then
-  echo; echo "Uploading snapshot to $replica_to ..."
-  kubectl cp $snapshot_path "$replica_to:/var/data/snapshot.bin" -c $CONTAINER -n $NAMESPACE
+  echo "$replica_to: Pausing sync ..."
+  kubectl exec -it "$replica_to" -c "$CONTAINER" -n "$NAMESPACE" -- sh -c "miner repair sync_pause"
 
-  echo "Importing snapshot ..."
-  kubectl exec -it "$replica_to" -c $CONTAINER -n $NAMESPACE -- sh -c "miner snapshot load /var/data/snapshot.bin"
+  echo "$replica_to: Clearing existing data ..."
+  kubectl exec -it "$replica_to" -c "$CONTAINER" -n "$NAMESPACE" -- sh -c "rm -rf block* checkpoints *.db log lost* miner saved-snaps stats"
+
+  echo; echo "$replica_to: Uploading snapshot to ..."
+  kubectl cp "$snapshot_path" "$replica_to:/var/data/snapshot.bin" -c "$CONTAINER" -n "$NAMESPACE"
+
+  echo "$replica_to: Importing snapshot ..."
+  kubectl exec -it "$replica_to" -c "$CONTAINER" -n "$NAMESPACE" -- sh -c "miner snapshot load /var/data/snapshot.bin"
+
+  echo "$replica_to: Resuming sync ..."
+  kubectl exec -it "$replica_to" -c "$CONTAINER" -n "$NAMESPACE" -- sh -c "miner repair sync_resume"
 fi
 
 echo "Finished!"

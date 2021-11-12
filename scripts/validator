@@ -74,11 +74,11 @@ elif [[ $CMD == "cg_perf" ]]; then
 
 elif [[ $CMD == "bash" ]]; then
   pod_id=$2
-  kubectl exec -it "validator-$pod_id" -c validator -- /bin/ash
+  kubectl exec -it "validator-$pod_id" -n "$NAMESPACE" -c validator -- /bin/ash
 
 elif [[ $CMD == "logs" ]]; then
   pod_id=$2
-  kubectl exec "validator-$pod_id" -c validator -- tail -F /var/data/log/{console,error,crash}.log
+  kubectl exec "validator-$pod_id" -n "$NAMESPACE" -c validator -- tail -F /var/data/log/{console,error,crash}.log
 
 elif [[ $CMD == "reset_db" ]]; then
   pod_id=$2
@@ -112,7 +112,7 @@ elif [[ $CMD == "pvc" ]]; then
     exit 1
   fi
 
-  kubectl patch pvc "validator-vol-validator-$pod_id" -n $NAMESPACE -p "{ \"spec\": { \"resources\": { \"requests\": { \"storage\": \"$disk_space\" }}}}"
+  kubectl patch pvc "validator-vol-validator-$pod_id" -n "$NAMESPACE" -p "{ \"spec\": { \"resources\": { \"requests\": { \"storage\": \"$disk_space\" }}}}"
 
 else
   echo "$0: unknown command \"$CMD\" - (info|peers|cg_perf|bash|logs|reset_db|kickstart|top|addrs|pvc)"
