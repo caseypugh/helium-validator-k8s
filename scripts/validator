@@ -95,6 +95,10 @@ elif [[ $CMD == "kickstart" ]]; then
   pod_id=$2
   kubectl exec -it "validator-$pod_id" -c validator -- sh -c "miner peer connect /ip4/3.137.173.26/tcp/2154"
 
+elif [[ $CMD == "listen_addr" ]]; then
+  pod_id=$2
+  kubectl exec -it "validator-$pod_id" -c validator -- sh -c "miner peer listen --format=csv"
+
 elif [[ $CMD == "top" ]]; then
   kubectl top pods --all-namespaces
 
