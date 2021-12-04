@@ -26,7 +26,7 @@ fi
 if [ -n "$replica_from" ]; then
   # if test $(find "$snapshot_path" -mmin +30); then
   download=1
-  if [ -f $snapshot_path ]; then
+  if [ -f "$snapshot_path" ]; then
     echo -n "$snapshot_path already exists. Do you still want to download (y/n)? "; read answer
     if [ "$answer" == "${answer#[Yy]}" ] ; then
       download=
