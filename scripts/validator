@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
 # Validator helper utility 
-# info|peers|cg_perf|bash|logs|reset_db|kickstart
 #
 
 cd "$(dirname "$0")" || exit
@@ -72,7 +71,7 @@ elif [[ $CMD == "cg_perf" ]]; then
   shift
   kubectl exec -it validator-0 -c validator -- sh -c "miner hbbft perf $@"
 
-elif [[ $CMD == "bash" ]]; then
+elif [[ $CMD == "bash" ]] || [[ $CMD == "shell" ]]; then
   pod_id=$2
   kubectl exec -it "validator-$pod_id" -n "$NAMESPACE" -c validator -- /bin/ash
 
