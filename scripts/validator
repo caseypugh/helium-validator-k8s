@@ -59,10 +59,10 @@ elif [[ $CMD == "addrs" ]]; then
   for ((i = 0; i < validator_count; i++)); do
     pod="validator-$i"
     echo; echo "Pod: $pod"
-    echo "'peer listen':"
-    kubectl exec -it $pod -c validator -- sh -c "miner peer listen --format=csv"
-    echo; echo "'peer addr':"
-    kubectl exec -it $pod -c validator -- sh -c "miner peer addr"
+    # echo "'peer listen':"
+    kubectl exec -it $pod -c validator -- sh -c "miner peer listen --format=csv | tail -n1"
+    # echo; echo "'peer addr':"
+    # kubectl exec -it $pod -c validator -- sh -c "miner peer addr"
   done
 
   
