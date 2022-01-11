@@ -1,0 +1,13 @@
+#!/bin/bash
+
+addrs=$(scripts/validator addrs | grep "/ip4"); echo $addrs; echo; 
+
+validator_count=$(kubectl get pods | grep -c "validator")
+# for j in 0 1 2 3 4 5 6 7 8 9 10 11; do 
+for ((i = 0; i < validator_count; i++)); do
+  echo
+  echo "--- validator-$i ---"
+  for addr in $addrs; do 
+    kubectl exec -it "validator-$i" -c validator -- sh -c "miner peer connect $addr"
+  done
+done
