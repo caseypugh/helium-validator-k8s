@@ -47,7 +47,7 @@ if [ -n "$replica_to" ]; then
   kubectl exec -it "$replica_to" -c "$CONTAINER" -n "$NAMESPACE" -- sh -c "miner repair sync_pause"
 
   echo "$replica_to: Clearing existing data ..."
-  kubectl exec -it "$replica_to" -c "$CONTAINER" -n "$NAMESPACE" -- sh -c "rm -rf block* checkpoints *.db log lost* miner saved-snaps stats"
+  kubectl exec -it "$replica_to" -c "$CONTAINER" -n "$NAMESPACE" -- sh -c "rm -rf block* checkpoints *.db log lost* saved-snaps stats"
 
   echo; echo "$replica_to: Uploading snapshot to ..."
   kubectl cp "$snapshot_path" "$replica_to:/var/data/snapshot.bin" -c "$CONTAINER" -n "$NAMESPACE"
