@@ -88,7 +88,7 @@ elif [[ $CMD == "reset_db" ]]; then
   fi
 
   kubectl exec -it "validator-$pod_id" -c validator -- sh -c "cd /var/data; rm -rf *.db; rm -rf blockchain_swarm; rm -rf log; rm -rf lost+found;"
-  kubectl delete pod "validator-$pod_id" &
+  kubectl delete pod "validator-$pod_id"
 
 elif [[ $CMD == "kickstart" ]]; then
   pod_id=$2
