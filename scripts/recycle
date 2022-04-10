@@ -1,0 +1,48 @@
+#!/bin/bash
+set -e
+
+pod_id=$1
+healthy_pod_id=$2
+
+if [ -z $pod_id ] || [ -z $healthy_pod_id ]; then
+  echo "$0: you must specify a bad pod ID and a healthy pod ID as arguments"
+  exit 1
+fi
+
+echo "$(date) Starting recycle on pod $pod_id using snapshot from $healthy_pod_id ..."
+echo
+
+
+# Response must say OK not not RPC error otherwise you'll have a faulty snpashot
+echo "$(date) Downloading snapshot..."
+download=$(./scripts/snapshot download $healthy_pod_id)
+echo "download => $?"
+echo $download
+#read
+
+# Delete the data and wait for pod to reboot...
+echo "$(date) Resetting validator db..."
+reset=$(./scripts/validator reset_db $pod_id)
+echo "reset => $?"
+echo $reset
+#read
+
+# each of these steps must say OK.. need to update this script to fail if they dont.
+echo "$(date) Uploading snapshot..."
+upload=$(./scripts/snapshot upload $pod_id)
+echo "upload => $?"
+echo $upload
+#read
+
+# sometimes after importing a snapshot the resume_sync command doesnt go through and you have to tell it to resume sync again after a restart...
+echo "$(date) Resuming sync..."
+resume=$(kubectl exec -it "validator-$pod_id" -c "validator" -n "helium" -- sh -c "miner repair sync_resume")
+echo "resume => $?"
+echo $resume
+
+echo
+echo "$(date) All done"
+echo
+echo "Waiting 30s then checking block height:"
+sleep 30
+kubectl exec -it "validator-$pod_id" -c "validator" -n "helium" -- sh -c "miner info height"
