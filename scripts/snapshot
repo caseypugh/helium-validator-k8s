@@ -5,7 +5,7 @@ CONTAINER=validator
 CMD=$1
 replica_from=
 replica_to=
-snapshot_path=./snapshot.bin
+snapshot_path=./snapshot.bin.gz
 
 if [[ "$CMD" == "download" || "$CMD" == "take" ]]; then
   replica_from="validator-$2"
