@@ -35,10 +35,10 @@ if [ -n "$replica_from" ]; then
 
   if [ -n "$download" ]; then
     echo; echo "$replica_from: Exporting snapshot ..."
-    kubectl exec -it "$replica_from" -c $CONTAINER -n $NAMESPACE -- sh -c "miner snapshot take /var/data/snapshot.bin"
+    kubectl exec -it "$replica_from" -c $CONTAINER -n $NAMESPACE -- sh -c "rm -f /var/data/snapshot.bin; miner snapshot take /var/data/snapshot.bin"
 
     echo "$replica_from: Downloading snapshot ..."
-    kubectl cp "$replica_from:/var/data/snapshot.bin" "$snapshot_path" -c $CONTAINER -n $NAMESPACE > /dev/null
+    kubectl cp "$replica_from:/var/data/snapshot.bin.gz" "$snapshot_path" -c $CONTAINER -n $NAMESPACE > /dev/null
   fi
 fi
 
@@ -50,7 +50,7 @@ if [ -n "$replica_to" ]; then
   kubectl exec -it "$replica_to" -c "$CONTAINER" -n "$NAMESPACE" -- sh -c "miner repair sync_pause"
 
   echo "$replica_to: Importing snapshot ..."
-  kubectl exec -it "$replica_to" -c "$CONTAINER" -n "$NAMESPACE" -- sh -c "miner snapshot load /var/data/snapshot.bin"
+  kubectl exec -it "$replica_to" -c "$CONTAINER" -n "$NAMESPACE" -- sh -c "miner snapshot load /var/data/snapshot.bin.gz"
 
   echo "$replica_to: Resuming sync ..."
   kubectl exec -it "$replica_to" -c "$CONTAINER" -n "$NAMESPACE" -- sh -c "miner repair sync_resume"
