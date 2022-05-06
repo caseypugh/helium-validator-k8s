@@ -9,7 +9,7 @@ keys.yml
 kubectl
 kubectl.sha256
 assets/logo.psd
-snapshot.bin
+snapshot.bin.gz
 scripts/keys/*
 k8s/grafana/external-dns*
 *.bak
