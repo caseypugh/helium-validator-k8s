@@ -17,7 +17,7 @@ spec:
       labels:
         name: validator
         app: validator # being used by ServiceMonitor; could we target 'name' instead?
-        dynamic-hostports: '2154.8080' # must be a string. Split multiple ports with '.'
+        dynamic-hostports: '8080.2154' # must be a string. Split multiple ports with '.'
     spec:
       shareProcessNamespace: true # otherwise you'll end up with mountains of zombie processes
       containers:
@@ -96,9 +96,9 @@ spec:
               mountPath: /var/data
             - name: podinfo
               mountPath: /etc/podinfo
-            - mountPath: /opt/miner/usr/validator-setup.sh
+            - name: config
+              mountPath: /opt/miner/usr/validator-setup.sh
               subPath: validator-setup.sh
-              name: config
 
       volumes:
         - name: podinfo
