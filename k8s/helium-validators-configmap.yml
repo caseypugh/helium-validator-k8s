@@ -4,16 +4,23 @@ metadata:
   name: validator
 data:
   validator-setup.sh: |
-    # Wait for port to be available via 
-    while [ -z "$NAT_EXTERNAL_PORT" ]; do
+    # Wait for port to be available via
+    while [ -z "$GRPC_PORT" ]; do
       echo "Searching for port...";
       port=$(cat /etc/podinfo/annotations | grep "k8s/2154" | grep -oE "\"[0-9]+\"" | grep -oE "[0-9]+" | xargs);
       if [ -n "$port" ]; then
         export NAT_EXTERNAL_IP=$(wget -qO- ifconfig.me);
         export NAT_EXTERNAL_PORT=$port;
-        echo "Port found! NAT_EXTERNAL_IP=$NAT_EXTERNAL_IP NAT_EXTERNAL_PORT=$NAT_EXTERNAL_PORT";
+        echo "2154 port found! NAT_EXTERNAL_IP=$NAT_EXTERNAL_IP NAT_EXTERNAL_PORT=$NAT_EXTERNAL_PORT";
         echo "export NAT_EXTERNAL_IP=$NAT_EXTERNAL_IP" >> ~/.profile;
         echo "export NAT_EXTERNAL_PORT=$NAT_EXTERNAL_PORT" >> ~/.profile;
+      fi;
+
+      port=$(cat /etc/podinfo/annotations | grep "k8s/8080" | grep -oE "\"[0-9]+\"" | grep -oE "[0-9]+" | xargs);
+      if [ -n "$port" ]; then
+        export GRPC_PORT=$port;
+        echo "8080 port found! GRPC_PORT=$GRPC_PORT";
+        echo "export GRPC_PORT=$GRPC_PORT" >> ~/.profile;
         break;
       fi;
       sleep 2;
@@ -106,7 +113,7 @@ data:
           echo "[Version] Latest $latest_version_sha";
           echo "[Version] Current $current_version_sha ($container_version)";
           echo "[Version] Shutting down validator";
-          
+
           tail_process=$(pgrep -f "tail -F /var/data");
           kill "$tail_process";
           exit 1;
