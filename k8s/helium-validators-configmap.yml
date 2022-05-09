@@ -5,7 +5,7 @@ metadata:
 data:
   validator-setup.sh: |
     # Wait for port to be available via
-    while [ -z "$GRPC_PORT" ]; do
+    while [[ -z "$GRPC_PORT" && -z "$NAT_EXTERNAL_PORT" ]]; do
       echo "Searching for port...";
       port=$(cat /etc/podinfo/annotations | grep "k8s/2154" | grep -oE "\"[0-9]+\"" | grep -oE "[0-9]+" | xargs);
       if [ -n "$port" ]; then
@@ -21,7 +21,6 @@ data:
         export GRPC_PORT=$port;
         echo "8080 port found! GRPC_PORT=$GRPC_PORT";
         echo "export GRPC_PORT=$GRPC_PORT" >> ~/.profile;
-        break;
       fi;
       sleep 2;
     done;
