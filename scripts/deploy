@@ -49,10 +49,10 @@ validator_version=latest
 TESTNET=
 if [[ "$current_context" == "$MAINNET_CLUSTER" ]]; then
   total_validators=$TOTAL_MAINNET_VALIDATORS
-  validator_version=$VALIDATOR_MAINNET_VERSION
+  validator_version="$VALIDATOR_MAINNET_VERSION"
 elif [[ "$current_context" == "$TESTNET_CLUSTER" ]]; then
   total_validators=$TOTAL_TESTNET_VALIDATORS
-  validator_version=$VALIDATOR_TESTNET_VERSION
+  validator_version="$VALIDATOR_TESTNET_VERSION"
   TESTNET=1
 else
   echo "Warning, no TOTAL_*_VALIDATORS configured; defaulting to $total_validators"
@@ -75,7 +75,7 @@ echo "Checking if $hostport_namespace exists..."
 if ! echo "$namespaces" | grep -q "$hostport_namespace"; then
   echo "Installing $hostport_namespace"
   kubectl apply -f https://raw.githubusercontent.com/0blu/dynamic-hostports-k8s/master/deploy.yaml
-else 
+else
   echo "hostports release already exists"
 fi
 
@@ -103,7 +103,7 @@ if [ -n "$TESTNET" ]; then
   if [[ "$validator_version" == "latest" ]]; then
     VALIDATOR_IMG="latest-val-amd64"
   else
-    VALIDATOR_IMG="miner-amd64_testnet_val${validator_version}"
+    VALIDATOR_IMG="validator-amd64_${validator_version}"
   fi
 else
   # Legacy version check (images were renamed). Eventually can delete this code
@@ -111,8 +111,6 @@ else
 
   if [[ "$validator_version" == "latest" ]]; then
     VALIDATOR_IMG="latest-validator-amd64"
-  elif [[ "$is_old_version" == "old" ]]; then
-    VALIDATOR_IMG="miner-amd64_validator${validator_version}"
   else
     VALIDATOR_IMG="validator-amd64_${validator_version}"
   fi
@@ -130,7 +128,7 @@ kubectl apply -f ../k8s/exporter-service.yml -n $NAMESPACE
 rm $validator_yml
 
 if [[ $CMD == "restart" ]]; then
-  ./restart pod 
+  ./restart pod
 fi
 
 echo -e $(label "Finished!" $GREEN)
