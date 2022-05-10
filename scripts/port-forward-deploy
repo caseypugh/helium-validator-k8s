@@ -7,7 +7,7 @@ source ../.env
 
 # Poor Man's Service Generator
 
-echo; echo "PortForward: generating service ymls..."
+echo; echo -e "${GREEN}PortForward${NC}: generating service ymls..."
 
 replica_id=$1
 start_index=0
@@ -28,13 +28,27 @@ fi
 
 for ((i = start_index; i < validator_count; i++)); do
     validator="validator-$i"
-    echo;echo "$validator"
+    echo;echo -e "${GREEN}$validator${NC}"
 
-    # Get the node name for this validator
-    yaml=$(kubectl get pod -n $NAMESPACE $validator -o yaml)
-    node_name=$(echo "$yaml" | grep -oE "nodeName: $node_name_match" | grep -oE "$node_name_match")
-    pod_ip=$(echo "$yaml" | grep -oE "podIP: $ip_match" | grep -oE "$ip_match")
-    echo "- Node: $node_name"
+    # Get the node & pod ip for this validator
+    # Keep checking until it exists
+    pod_ip=
+    retry=0
+    while [[ -z "$pod_ip" ]]; do
+        yaml=$(kubectl get pod -n $NAMESPACE $validator -o yaml)
+        node_name=$(echo "$yaml" | grep -oE "nodeName: $node_name_match" | grep -oE "$node_name_match")
+        pod_ip=$(echo "$yaml" | grep -oE "podIP: $ip_match" | grep -oE "$ip_match")
+
+        if [[ "$retry" != 0 ]]; then
+            echo "... $validator PodIP not available. Retrying ..."
+            sleep 1
+        fi
+
+        retry=$((retry + 1))
+    done
+
+    echo -e "- Pod IP: ${PURPLE}$pod_ip${NC}"
+    echo -e "- Node: ${PURPLE}$node_name${NC}"
 
     # Get the node's IPs
     node_yaml=$(kubectl get nodes -n $NAMESPACE $node_name -o yaml)
