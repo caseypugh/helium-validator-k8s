@@ -51,12 +51,12 @@ for ((i = start_index; i < validator_count; i++)); do
     { rm "$service_file" && awk '{gsub("<SERVICE_NAME>", "'$service_name'", $0); print}' > "$service_file"; } < "$service_file"
     { rm "$service_file" && awk '{gsub("<POD_IP>", "'$pod_ip'", $0); print}' > "$service_file"; } < "$service_file"
 
-    i=0
+    j=0
     while IFS= read -r ip; do
-        if [[ "$i" == "1" ]]; then
+        if [[ "$j" == "1" ]]; then
             { rm "$service_file" && awk '{gsub("<NODE_EXTERNAL_IP>", "'$ip'", $0); print}' > "$service_file"; } < "$service_file"
         fi
-        i=$((i+1))
+        j=$((j+1))
     done <<< "$ips"
 
     { rm "$service_file" && awk '{gsub("<VALIDATOR_PORT>", "'$port'", $0); print}' > "$service_file"; } < "$service_file"
