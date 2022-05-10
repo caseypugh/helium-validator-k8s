@@ -4,7 +4,7 @@
 
 This is a DigitalOcean-specific [Kubernetes (k8s)](https://kubernetes.io/) setup for running a cluster of [Helium validators](https://www.helium.com/stake). Some modifications are necessary to run on other Kubernetes hosts. Currently powering over 20 validators.
 
-Development is still early and pull requests are welcome! ✌️ Also feel free to [join our Discord](https://discord.gg/EChYsrYKJz) to ask questions/get help.
+Development is still early and pull requests are welcome! 
 
 - [Local environment setup](#local-environment-setup)
   - [Extra tools](#extra-tools)
