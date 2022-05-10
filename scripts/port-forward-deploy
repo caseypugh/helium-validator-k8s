@@ -9,14 +9,25 @@ source ../.env
 
 echo; echo "PortForward: generating service ymls..."
 
+replica_id=$1
+start_index=0
+
 service_tmpl=../k8s/port-forward.yml
 
 validators=$(kubectl get pods -n $NAMESPACE | grep -oE "validator-[0-9]+")
+validator_count=$(echo "$validators" | grep -c "valid")
 node_name_match="[a-z0-9]+\-[a-z0-9]+\-[a-z0-9]+(\-[a-z0-9]+)?"
 ip_match="([0-9]+\.?)+"
-
 port="30000"
-while IFS= read -r validator; do
+
+if [ -n "$replica_id" ]; then
+  start_index=$replica_id
+  validator_count=$((replica_id + 1))
+  port=$((port + replica_id))
+fi
+
+for ((i = start_index; i < validator_count; i++)); do
+    validator="validator-$i"
     echo;echo "$validator"
 
     # Get the node name for this validator
@@ -36,8 +47,9 @@ while IFS= read -r validator; do
     cp $service_tmpl $service_file
 
     # Update all the fields in the template
+    { rm "$service_file" && awk '{gsub("<VALIDATOR_NAME>", "'$validator'", $0); print}' > "$service_file"; } < "$service_file"
     { rm "$service_file" && awk '{gsub("<SERVICE_NAME>", "'$service_name'", $0); print}' > "$service_file"; } < "$service_file"
-    { rm "$service_file" && awk '{gsub("<NODE_CLUSER_IP>", "'$pod_ip'", $0); print}' > "$service_file"; } < "$service_file"
+    { rm "$service_file" && awk '{gsub("<POD_IP>", "'$pod_ip'", $0); print}' > "$service_file"; } < "$service_file"
 
     i=0
     while IFS= read -r ip; do
@@ -55,6 +67,6 @@ while IFS= read -r validator; do
     echo "- Deployed ($rsp)"
 
     port=$((port+1))
-done <<< "$validators"
+done
 
 rm ../k8s/*-grpc.yml
