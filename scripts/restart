@@ -41,7 +41,7 @@ for ((i = start_index; i < validator_count; i++)); do
       fi
 
       # Wait a bit for pod to restart
-      sleep 5
+      sleep 10
       ./port-forward-deploy $replica_id
     fi
   elif [[ $CMD == "exporter" ]]; then
