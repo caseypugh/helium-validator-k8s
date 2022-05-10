@@ -4,7 +4,7 @@ cd "$(dirname "$0")" || exit
 source helper
 source ../.env
 
-CMD=$1 
+CMD=$1
 
 pattern="pod|validator|exporter"
 if [[ ! $CMD =~ $pattern ]]; then
@@ -25,7 +25,7 @@ fi
 for ((i = start_index; i < validator_count; i++)); do
   pod="validator-$i"
 
-  if [[ $CMD == "pod" ]] || [[ $CMD == "validator" ]]; then 
+  if [[ $CMD == "pod" ]] || [[ $CMD == "validator" ]]; then
     # Skip pod deletion if validator is in consensus
     echo "Checking if $pod is in consensus..."
     in_consensus="$(is_in_consensus $i)"
@@ -35,10 +35,14 @@ for ((i = start_index; i < validator_count; i++)); do
       if [[ $CMD == "pod" ]]; then
         echo "Restarting $pod ..."
         kubectl delete pod $pod -n $NAMESPACE
-      else 
+      else
         echo "Restarting validator container in $pod ..."
         kubectl exec -it $pod -c validator -n $NAMESPACE -- sh -c 'kill $(pgrep -f "tail -F /var/data")'
       fi
+
+      # Wait a bit for pod to restart
+      sleep 5
+      ./port-forward-deploy $replica_id
     fi
   elif [[ $CMD == "exporter" ]]; then
     echo "Restarting validator-exporter container in $pod ..."
