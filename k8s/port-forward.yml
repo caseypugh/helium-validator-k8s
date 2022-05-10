@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    helium-validator/for-pod: 'validator-0'
+    helium-validator/grpc-port: '<VALIDATOR_PORT>'
+  name: <SERVICE_NAME>
+  namespace: helium
+spec:
+  externalIPs:
+  - <NODE_EXTERNAL_IP>
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - nodePort: <VALIDATOR_PORT>
+    port: <VALIDATOR_PORT>
+    protocol: TCP
+    targetPort: <VALIDATOR_PORT>
+  sessionAffinity: None
+  type: NodePort

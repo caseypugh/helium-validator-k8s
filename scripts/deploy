@@ -127,6 +127,9 @@ kubectl apply -f ../k8s/exporter-service.yml -n $NAMESPACE
 # Cleanup temp files
 rm $validator_yml
 
+# Setup port forwarding for GRPC
+./port-forward-deploy
+
 if [[ $CMD == "restart" ]]; then
   ./restart pod
 fi
