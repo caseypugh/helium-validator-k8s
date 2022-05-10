@@ -120,11 +120,15 @@ echo -e "Setting validator image to: $(label "$VALIDATOR_IMG" $GREEN)"
 { rm "$validator_yml" && awk '{gsub("latest-validator-amd64", "'$VALIDATOR_IMG'", $0); print}' > "$validator_yml"; } < "$validator_yml"
 
 # Apply the new configurations
+echo "Applying configurations..."
 kubectl apply -f ../k8s/helium-validators-configmap.yml -n $NAMESPACE
+echo "validator"
 kubectl apply -f $validator_yml -n $NAMESPACE
+echo "exporter"
 kubectl apply -f ../k8s/exporter-service.yml -n $NAMESPACE
 
 # Cleanup temp files
+echo "cleanup tmp files..."
 rm $validator_yml
 
 # Setup port forwarding for GRPC
