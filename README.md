@@ -40,7 +40,7 @@ All the core essentials you will need to get your environment setup:
 ## Extra tools
 Some very helpful tools to make your Kubernetes life easier:
 - [🐶k9s](https://github.com/derailed/k9s) - A must have! K9s provides a terminal UI to interact with your Kubernetes clusters.
-- [BotKube](https://www.botkube.io/) - BotKube is a messaging bot for monitoring and debugging Kubernetes clusters.
+- [BotKube](https://www.botkube.io/) - a Slack/Discord bot for monitoring and debugging Kubernetes clusters.
 
 
 # Cluster setup
@@ -61,6 +61,7 @@ doctl kubernetes cluster kubeconfig save helium-cluster
 ```
 
 ## Deploy the validators
+
 Before you setup the validators, create a `helium` namespace and set it as your default:
 ```sh
 kubectl create ns helium
