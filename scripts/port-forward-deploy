@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+cd "$(dirname "$0")" || exit
+
+source helper
+source ../.env
+
+# Poor Man's Service Generator
+
+echo; echo "PortForward: generating service ymls..."
+
+service_tmpl=../k8s/port-forward.yml
+
+validators=$(kubectl get pods -n $NAMESPACE | grep -oE "validator-[0-9]+")
+node_name_match="[a-z0-9]+\-[a-z0-9]+\-[a-z0-9]+(\-[a-z0-9]+)?"
+ip_match="([0-9]+\.?)+"
+
+port="30000"
+while IFS= read -r validator; do
+    echo;echo "$validator"
+
+    # Get the node name for this validator
+    yaml=$(kubectl get pod -n $NAMESPACE $validator -o yaml)
+    node_name=$(echo "$yaml" | grep -oE "nodeName: $node_name_match" | grep -oE "$node_name_match")
+    pod_ip=$(echo "$yaml" | grep -oE "podIP: $ip_match" | grep -oE "$ip_match")
+    echo "- Node: $node_name"
+
+    # Get the node's IPs
+    node_yaml=$(kubectl get nodes -n $NAMESPACE $node_name -o yaml)
+    ips=$(echo "$node_yaml" | grep -oE "address: $ip_match" | grep -oE "$ip_match")
+    echo "- IPs: $ips"
+
+    # Create the template file
+    service_name="$validator-grpc"
+    service_file="../k8s/$service_name.yml"
+    cp $service_tmpl $service_file
+
+    # Update all the fields in the template
+    { rm "$service_file" && awk '{gsub("<SERVICE_NAME>", "'$service_name'", $0); print}' > "$service_file"; } < "$service_file"
+    { rm "$service_file" && awk '{gsub("<NODE_CLUSER_IP>", "'$pod_ip'", $0); print}' > "$service_file"; } < "$service_file"
+
+    i=0
+    while IFS= read -r ip; do
+        if [[ "$i" == "1" ]]; then
+            { rm "$service_file" && awk '{gsub("<NODE_EXTERNAL_IP>", "'$ip'", $0); print}' > "$service_file"; } < "$service_file"
+        fi
+        i=$((i+1))
+    done <<< "$ips"
+
+    { rm "$service_file" && awk '{gsub("<VALIDATOR_PORT>", "'$port'", $0); print}' > "$service_file"; } < "$service_file"
+
+    echo "- Generated service file ${service_file}"
+
+    rsp=$(kubectl apply -f $service_file -n $NAMESPACE)
+    echo "- Deployed ($rsp)"
+
+    port=$((port+1))
+done <<< "$validators"
+
+rm ../k8s/*-grpc.yml

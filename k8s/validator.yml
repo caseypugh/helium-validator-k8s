@@ -17,7 +17,7 @@ spec:
       labels:
         name: validator
         app: validator # being used by ServiceMonitor; could we target 'name' instead?
-        dynamic-hostports: '8080.2154' # must be a string. Split multiple ports with '.'
+        dynamic-hostports: '2154' # must be a string. Split multiple ports with '.'
     spec:
       shareProcessNamespace: true # otherwise you'll end up with mountains of zombie processes
       containers:
@@ -90,7 +90,20 @@ spec:
           ports:
             - containerPort: 2154
             - containerPort: 4467
-            - containerPort: 8080
+            - containerPort: 30000
+            - containerPort: 30001
+            - containerPort: 30002
+            - containerPort: 30003
+            - containerPort: 30004
+            - containerPort: 30005
+            - containerPort: 30006
+            - containerPort: 30007
+            - containerPort: 30008
+            - containerPort: 30009
+            - containerPort: 30010
+            - containerPort: 30011
+            - containerPort: 30012
+            - containerPort: 30013
           volumeMounts:
             - name: validator-vol
               mountPath: /var/data
