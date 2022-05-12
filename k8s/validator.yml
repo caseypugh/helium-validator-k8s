@@ -50,8 +50,8 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              cpu: 4
-              memory: "3Gi"
+              cpu: 2
+              memory: "2Gi"
           livenessProbe:
             tcpSocket:
               port: 2154
